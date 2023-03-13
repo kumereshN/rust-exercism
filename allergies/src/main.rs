@@ -15,15 +15,6 @@ pub enum Allergen {
     Cats,
 }
 
-impl Default for Allergen {
-    fn default() -> u32{
-        match Allergen {
-            Allergen::Eggs => 1,
-            _ => 42
-        }
-    }
-}
-
 impl Allergies {
     pub fn new(score: u32) -> Self {
         Allergies{score}
