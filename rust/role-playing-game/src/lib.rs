@@ -1,3 +1,5 @@
+use std::cmp::min;
+
 pub struct Player {
     pub health: u32,
     pub mana: Option<u32>,
@@ -5,40 +7,34 @@ pub struct Player {
 }
 
 impl Player {
+    fn new(level: u32) -> Player {
+        Self {
+            health: 100,
+            mana: if level < 10 { None } else { Some(100) },
+            level
+        }
+    }
+
     pub fn revive(&self) -> Option<Player> {
-        if self.health < 1 {
-            if self.level < 10 {
-                Some(Self {
-                    health: 100,
-                    mana: None,
-                    level: self.level
-                })
-            } else {
-                Some(Self {
-                    health: 100,
-                    mana: Some(100),
-                    level: self.level
-                })
-            }
-        } else {
-            None
+        match self.health {
+            0 => Some(Player::new(self.level)),
+            _ => None
         }
     }
 
     pub fn cast_spell(&mut self, mana_cost: u32) -> u32 {
-        if self.mana.is_none() {
-            if mana_cost > self.health {
-                self.health = 0;
-                0
+        match self.mana {
+            Some(x) => if x >= mana_cost {
+                self.mana = Some(x - mana_cost);
+                2 * mana_cost
             } else {
-                self.health -= mana_cost;
                 0
             }
-        } else if self.mana < Some(mana_cost) {
-            0
-        } else {
-            self.mana = Some(self.mana.unwrap() - mana_cost);
-            mana_cost * 2
+
+            None => {
+                self.health = self.health - min(self.health, mana_cost);
+                0
+            }
         }
     }
 }
