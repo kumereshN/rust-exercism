@@ -75,7 +75,7 @@ fn test_ten_digit_non_armstrong_number() {
 // and therefore will be detected as an Armstrong number if you are
 // incorrectly using wrapping arithmetic.
 #[test]
-#[ignore]
+
 fn test_properly_handles_overflow() {
     assert!(!is_armstrong_number(4_106_098_957));
 }

@@ -4,8 +4,8 @@ pub fn is_armstrong_number(num: u32) -> bool {
         .to_string()
         .chars()
         .map(|w| {
-        w.to_digit(10).unwrap().pow(len_num)
+        w.to_digit(10).unwrap().pow(len_num) as u64
     })
-        .collect::<Vec<u32>>().iter().sum();
-    num == total_sum
+        .sum::<u64>();
+    num as u64 == total_sum
 }
