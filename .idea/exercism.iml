@@ -11,14 +11,20 @@
       <sourceFolder url="file://$MODULE_DIR$/rust/rpn-calculator/tests" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/rust/reverse-string/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/rust/reverse-string/tests" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/rust/armstrong-numbers/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/rust/armstrong-numbers/tests" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/rust/gigasecond/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/rust/gigasecond/tests" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/rust/difference-of-squares/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/rust/difference-of-squares/tests" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/resistor-color/target" />
       <excludeFolder url="file://$MODULE_DIR$/allergies/target" />
       <excludeFolder url="file://$MODULE_DIR$/rust/magazine-cutout/target" />
       <excludeFolder url="file://$MODULE_DIR$/rust/rpn-calculator/target" />
       <excludeFolder url="file://$MODULE_DIR$/rust/reverse-string/target" />
       <excludeFolder url="file://$MODULE_DIR$/rust/gigasecond/target" />
+      <excludeFolder url="file://$MODULE_DIR$/rust/armstrong-numbers/target" />
+      <excludeFolder url="file://$MODULE_DIR$/rust/difference-of-squares/target" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
