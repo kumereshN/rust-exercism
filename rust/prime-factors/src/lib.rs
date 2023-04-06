@@ -1,0 +1,15 @@
+pub fn factors(mut n: u64) -> Vec<u64> {
+    let mut factors = Vec::new();
+    let mut candidates = (3..).step_by(2);
+    let mut prime = 2;
+
+    while n > 1 {
+        while n % prime == 0 {
+            n /= prime;
+            factors.push(prime);
+        }
+
+        prime = candidates.next().unwrap();
+    }
+    factors
+}
