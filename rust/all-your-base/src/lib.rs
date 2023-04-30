@@ -68,11 +68,8 @@ fn convert_digits_to_target_base(vec_of_numbers: Vec<u32>, to_base: u32) -> Vec<
         res.push(reminder);
         num /= to_base;
     }
+    res.reverse();
     res
-        .iter()
-        .rev()
-        .copied()
-        .collect::<Vec<u32>>()
 }
 
 pub fn convert(number: &[u32], from_base: u32, to_base: u32) -> Result<Vec<u32>, Error> {
@@ -82,9 +79,9 @@ pub fn convert(number: &[u32], from_base: u32, to_base: u32) -> Result<Vec<u32>,
         }
         (_, 0..=1) => {
             Err(Error::InvalidOutputBase)
-        }
-        (2, 10) => {
-            if number.iter().any(|&n| !(0..=1).contains(&n)) {
+        },
+        (_, 10) => {
+            if number.iter().any(|&n| n >= from_base) {
                 let invalid_num = number
                     .iter()
                     .filter(|&&n| n > 1)
@@ -96,10 +93,6 @@ pub fn convert(number: &[u32], from_base: u32, to_base: u32) -> Result<Vec<u32>,
                 let base_10_digit = convert_digits_to_base_10(number.to_vec(), from_base);
                 Ok(base_10_digit)
             }
-        },
-        (_, 10) => {
-            let base_10_digit = convert_digits_to_base_10(number.to_vec(), from_base);
-            Ok(base_10_digit)
         }
         (10, _) => {
             let res = convert_digits_to_target_base(number.to_vec(), to_base);
