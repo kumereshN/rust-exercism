@@ -36,8 +36,8 @@ pub enum Error {
 ///  * Never output leading 0 digits, unless the input number is 0, in which the output must be `[0]`.
 ///    However, your function must be able to process input with leading 0 digits.
 
-fn convert_digits_to_base_10(slice_of_numbers: &[u32], to_base: u32) -> u32{
-    slice_of_numbers
+fn convert_digits_to_base_10(vec_of_numbers: Vec<u32>, to_base: u32) -> Vec<u32>{
+    vec_of_numbers
         .iter()
         .rev()
         .enumerate()
@@ -45,31 +45,70 @@ fn convert_digits_to_base_10(slice_of_numbers: &[u32], to_base: u32) -> u32{
             n * (to_base.pow(i as u32))
         })
         .sum::<u32>()
+        .to_string()
+        .chars()
+        .filter_map(|c| c.to_digit(10))
+        .collect::<Vec<u32>>()
+
 }
 
-fn convert_digits_to_target_base(slice_of_numbers: &[u32], to_base: u32) -> u32 {
-    10
+fn convert_digits_to_target_base(vec_of_numbers: Vec<u32>, to_base: u32) -> Vec<u32> {
+    let mut num = vec_of_numbers
+        .iter()
+        .fold(0, |acc, &digit| acc * 10 + digit);
+
+    if num == 0 {
+        return vec![0]
+    }
+
+    let mut res:Vec<u32> = vec![];
+
+    while num != 0 {
+        let reminder = num % to_base;
+        res.push(reminder);
+        num /= to_base;
+    }
+    res
+        .iter()
+        .rev()
+        .copied()
+        .collect::<Vec<u32>>()
 }
 
 pub fn convert(number: &[u32], from_base: u32, to_base: u32) -> Result<Vec<u32>, Error> {
-
     match (from_base, to_base) {
-        (_, 10) => {
-            let base_10_digit = convert_digits_to_base_10(number, from_base)
-                .to_string()
-                .chars()
-                .filter_map(|c| {c.to_digit(10)})
-                .collect::<Vec<u32>>();
-            Ok(base_10_digit)
+        (0..=1, _) => {
+            Err(Error::InvalidInputBase)
+        }
+        (_, 0..=1) => {
+            Err(Error::InvalidOutputBase)
+        }
+        (2, 10) => {
+            if number.iter().any(|&n| !(0..=1).contains(&n)) {
+                let invalid_num = number
+                    .iter()
+                    .filter(|&&n| n > 1)
+                    .copied()
+                    .collect::<Vec<u32>>();
+
+                Err(Error::InvalidDigit(*invalid_num.first().unwrap()))
+            } else {
+                let base_10_digit = convert_digits_to_base_10(number.to_vec(), from_base);
+                Ok(base_10_digit)
+            }
         },
+        (_, 10) => {
+            let base_10_digit = convert_digits_to_base_10(number.to_vec(), from_base);
+            Ok(base_10_digit)
+        }
         (10, _) => {
-            let res = convert_digits_to_target_base(number, to_base);
-            Ok(vec![res])
+            let res = convert_digits_to_target_base(number.to_vec(), to_base);
+            Ok(res)
         },
         (_, _) => {
-            let base_10_vec = convert_digits_to_base_10(number, from_base);
-            let res = convert_digits_to_base_10(&[base_10_vec], to_base);
-            Ok(vec![res])
+            let base_10_vec = convert_digits_to_base_10(number.to_vec(), from_base);
+            let res = convert_digits_to_target_base(base_10_vec, to_base);
+            Ok(res)
         }
     }
 }
