@@ -81,18 +81,13 @@ pub fn convert(number: &[u32], from_base: u32, to_base: u32) -> Result<Vec<u32>,
             Err(Error::InvalidOutputBase)
         },
         (_, 10) => {
-            if number.iter().any(|&n| n >= from_base) {
-                let invalid_num = number
-                    .iter()
-                    .filter(|&&n| n > 1)
-                    .copied()
-                    .collect::<Vec<u32>>();
-
-                Err(Error::InvalidDigit(*invalid_num.first().unwrap()))
-            } else {
-                let base_10_digit = convert_digits_to_base_10(number.to_vec(), from_base);
-                Ok(base_10_digit)
+            for n in number {
+                if n >= &from_base{
+                    return Err(Error::InvalidDigit(*n))
+                }
             }
+            let base_10_digit = convert_digits_to_base_10(number.to_vec(), from_base);
+            Ok(base_10_digit)
         }
         (10, _) => {
             let res = convert_digits_to_target_base(number.to_vec(), to_base);
