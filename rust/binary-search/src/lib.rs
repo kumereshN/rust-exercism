@@ -1,20 +1,13 @@
-pub fn find(array: &[i32], key: i32) -> Option<usize> {
-    let mut left = 0;
-    let mut right = array.len() - 1;
+use std::cmp::Ordering;
 
-    while left <= right{
-        let mut mid = (left + right) / 2;
-        let mid_no = *array.get(mid).unwrap();
+pub fn find<T: AsRef<[U]>, U: Ord>(array: T, key: U) -> Option<usize> {
+    let array = array.as_ref();
 
-        if mid_no == key {
-            return Some(mid)
-        }
-        else if mid_no > key {
-            right = mid - 1;
-        }
-        else {
-            left = mid + 1;
+    let mid = array.len() / 2;
+    match key.cmp(array.get(mid)?) {
+            Ordering::Equal => Some(mid),
+            Ordering::Less => find(&array[..mid], key),
+            Ordering::Greater => find(&array[mid + 1..], key).map(|i| i + mid + 1),
         }
     }
-    return None
-}
+
