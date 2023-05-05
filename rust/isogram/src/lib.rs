@@ -1,20 +1,11 @@
-use std::collections::HashMap;
+use std::collections::HashSet;
 
 pub fn check(candidate: &str) -> bool {
-    let mut hm = HashMap::new();
+    let mut hs = HashSet::new();
 
     candidate
+        .to_lowercase()
         .chars()
-        .filter(|&c| c.is_ascii_alphabetic())
-        .for_each(|c| {
-            let lower_c  = c.to_ascii_lowercase();
-            hm
-                .entry(lower_c)
-                .and_modify(|e| {*e += 1})
-                .or_insert(0);
-        });
-
-    hm
-        .values()
-        .all(|&v| v == 1)
+        .filter(|c| c.is_ascii_alphabetic())
+        .all(|c| hs.insert(c))
 }

@@ -6,7 +6,6 @@ fn empty_string() {
 }
 
 #[test]
-#[ignore]
 fn only_lower_case_characters() {
     assert!(check("isogram"), "\"isogram\" should be an isogram.")
 }
@@ -28,7 +27,6 @@ fn longest_reported_english_isogram() {
 }
 
 #[test]
-#[ignore]
 fn one_duplicated_character_mixed_case() {
     assert!(
         !check("Alphabet"),
@@ -37,7 +35,6 @@ fn one_duplicated_character_mixed_case() {
 }
 
 #[test]
-#[ignore]
 fn hypothetical_isogramic_word_with_hyphen() {
     assert!(
         check("thumbscrew-japingly"),
@@ -46,7 +43,6 @@ fn hypothetical_isogramic_word_with_hyphen() {
 }
 
 #[test]
-#[ignore]
 fn isogram_with_duplicated_hyphen() {
     assert!(
         check("six-year-old"),
@@ -55,7 +51,6 @@ fn isogram_with_duplicated_hyphen() {
 }
 
 #[test]
-#[ignore]
 fn made_up_name_that_is_an_isogram() {
     assert!(
         check("Emily Jung Schwartzkopf"),
@@ -64,7 +59,6 @@ fn made_up_name_that_is_an_isogram() {
 }
 
 #[test]
-#[ignore]
 fn duplicated_character_in_the_middle() {
     assert!(
         !check("accentor"),
