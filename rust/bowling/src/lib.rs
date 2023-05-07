@@ -10,7 +10,7 @@ enum Frame {
     Strike
 }
 #[derive(Debug, PartialEq)]
-pub enum RollingState {
+enum RollingState {
     First(u8),
     Second(u8, u16),
     Complete
