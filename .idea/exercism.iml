@@ -27,6 +27,12 @@
       <sourceFolder url="file://$MODULE_DIR$/rust/bob/tests" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/rust/collatz-conjecture/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/rust/collatz-conjecture/tests" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/rust/binary-search/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/rust/binary-search/tests" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/rust/etl/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/rust/etl/tests" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/rust/isogram/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/rust/isogram/tests" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/resistor-color/target" />
       <excludeFolder url="file://$MODULE_DIR$/allergies/target" />
       <excludeFolder url="file://$MODULE_DIR$/rust/magazine-cutout/target" />
@@ -40,6 +46,9 @@
       <excludeFolder url="file://$MODULE_DIR$/rust/prime-factors/target" />
       <excludeFolder url="file://$MODULE_DIR$/rust/bob/target" />
       <excludeFolder url="file://$MODULE_DIR$/rust/collatz-conjecture/target" />
+      <excludeFolder url="file://$MODULE_DIR$/rust/binary-search/target" />
+      <excludeFolder url="file://$MODULE_DIR$/rust/etl/target" />
+      <excludeFolder url="file://$MODULE_DIR$/rust/isogram/target" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
