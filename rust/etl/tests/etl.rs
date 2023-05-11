@@ -10,7 +10,6 @@ fn test_transform_one_value() {
 }
 
 #[test]
-#[ignore]
 fn test_transform_more_values() {
     let input = input_from(&[(1, vec!['A', 'E', 'I', 'O', 'U'])]);
 
