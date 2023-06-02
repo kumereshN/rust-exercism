@@ -13,7 +13,7 @@ fn is_consonant(input_char: char) -> bool {
     consonants.contains(&input_char)
 }
 
-pub fn translate(input: &str) -> String {
+fn convert_str_to_pig_latin_str(input: &str) -> String {
 
     let first_two_chars = input.chars().take(2).collect::<String>();
     let first_char = input.chars().take(1).next().unwrap();
@@ -29,6 +29,11 @@ pub fn translate(input: &str) -> String {
                     format!("{remaining_chars}{find_qu}{ADD_AY}")
                 },
                 false => {
+                    if first_char == 'y'{
+                        let remaining_chars = input.chars().skip(1).collect::<String>();
+                        return format!("{remaining_chars}y{ADD_AY}")
+                    }
+
                     let consonant_clusters = input
                         .chars()
                         .take_while(|&c| { is_consonant(c) })
@@ -39,13 +44,13 @@ pub fn translate(input: &str) -> String {
                         .skip_while(|&c| consonant_clusters.contains(c))
                         .collect::<String>();
 
-                    if first_char == 'y'{
-                        let remaining_chars = input.chars().skip(1).collect::<String>();
-                        format!("{remaining_chars}y{ADD_AY}");
-                    }
                     format!("{remaining_chars}{consonant_clusters}{ADD_AY}")
                 }
             }
         }
     }
+}
+
+pub fn translate(input: &str) -> String {
+    convert_str_to_pig_latin_str(input)
 }
