@@ -73,7 +73,6 @@ fn test_decode_lower_case_string() {
 // consistency test
 
 #[test]
-#[ignore]
 fn test_consistency() {
     assert_eq!(
         "zzz ZZ  zZ",

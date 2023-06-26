@@ -40,17 +40,18 @@ pub fn encode(source: &str) -> String {
 
 pub fn decode(source: &str) -> String {
     let mut res = String::new();
-    let mut iter = source.chars();
+    let iter = source.chars();
+    let mut count = String::new();
 
-    while let Some(ch) = iter.next() {
+    for ch in iter {
         if ch.is_ascii_digit() {
-            let count = ch.to_digit(10).unwrap() as usize;
-            let repeated_ch = std::iter::repeat(iter.next().unwrap()).take(count).collect::<String>();
-            res.push_str(&repeated_ch);
+            count.push(ch);
         } else {
-            res.push(ch);
+            let total_count = count.parse::<usize>().unwrap_or(1);
+            let repeated_ch = std::iter::repeat(ch).take(total_count).collect::<String>();
+            res.push_str(&repeated_ch);
+            count = String::new();
         }
     }
-
     res
 }
