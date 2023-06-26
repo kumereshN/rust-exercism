@@ -1,3 +1,5 @@
+use std::iter;
+
 pub fn encode(source: &str) -> String {
     let mut res = String::new();
     let mut remainder = source;
@@ -16,19 +18,14 @@ pub fn encode(source: &str) -> String {
     }
 
 pub fn decode(source: &str) -> String {
-    let mut res = String::new();
-    let iter = source.chars();
-    let mut count = String::new();
-
-    for ch in iter {
-        if ch.is_ascii_digit() {
-            count.push(ch);
-        } else {
-            let total_count = count.parse::<usize>().unwrap_or(1);
-            let repeated_ch = std::iter::repeat(ch).take(total_count).collect::<String>();
-            res.push_str(&repeated_ch);
-            count = String::new();
-        }
-    }
-    res
+    source
+        .chars()
+        .filter(|&c: &char| !c.is_numeric())
+        .zip(
+            source
+                .split(|c: char| !c.is_numeric())
+                .map(|num| num.parse::<usize>().unwrap_or(1)),
+        )
+        .flat_map(|(c, count)| iter::repeat(c).take(count))
+        .collect()
 }
