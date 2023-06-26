@@ -1,42 +1,19 @@
-fn push_char(count: u8, ch: char, mut res: String) -> String {
-    match count {
-        1 => {
-            res.push(ch);
-        }
-        _ => {
-            res.push_str(count.to_string().as_str());
-            res.push(ch);
-        }
-    }
-    res
-}
-
 pub fn encode(source: &str) -> String {
-    // https://www.pythonpool.com/run-length-encoding-python/
-
     let mut res = String::new();
+    let mut remainder = source;
 
-    if source.is_empty() {
-        return res
-    }
+    while let Some(c) = remainder.chars().next() {
+        let count = remainder.chars().take_while(|&next| next == c).count();
 
-    let mut ch = source.chars().next().unwrap();
-    let remaining_chars = source.chars().skip(1);
-    let mut count: u8 = 1;
-
-    for c in remaining_chars {
-        if ch == c {
-            count += 1;
+        match count {
+            1 => res.push(c),
+            _ => res.push_str(&format!("{}{}", count, c)),
         }
-        else {
-            res = push_char(count, ch, res);
-            ch = c;
-            count = 1;
+
+        remainder = &remainder[count * c.len_utf8()..]
         }
-    }
-    res = push_char(count, ch, res);
     res
-}
+    }
 
 pub fn decode(source: &str) -> String {
     let mut res = String::new();
