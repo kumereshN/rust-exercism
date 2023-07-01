@@ -1,5 +1,4 @@
 use std::collections::HashMap;
-use std::fmt::format;
 use std::iter;
 
 pub fn tally(match_results: &str) -> String {
@@ -9,12 +8,17 @@ pub fn tally(match_results: &str) -> String {
         return heading
     }
 
-    let split_match_results = match_results.split(';').collect::<Vec<&str>>();
+    let split_match_results = match_results
+                                                    .lines()
+                                                    .flat_map(|l| {
+                                                        l.split(';')
+                                                    })
+                                                    .collect::<Vec<&str>>();
 
     iter::once(heading)
         .chain(
             split_match_results
-                .windows(3)
+                .chunks(3)
                 .map(|team| {
                     let (team1, team2, condition) = (team[0], team[1], team[2]);
                     let mut counter_hmap = HashMap::from([
@@ -22,7 +26,11 @@ pub fn tally(match_results: &str) -> String {
                         (team2, vec![0; 5])
                     ]);
                     match condition {
-                        "win" => {
+                        /*
+                        Have to change the format!() position,
+                        at the end sort it out according to the points
+                        the team scored*/
+                         "win" => {
                             counter_hmap.entry(team1).and_modify(|v| {
                                 v[0] += 1;
                                 v[1] += 1;
@@ -76,6 +84,7 @@ pub fn tally(match_results: &str) -> String {
                         },
                         "draw" => {"DRAW".to_string()},
                         _ => panic!("Unknown condition")
+
                     }
                 })
         )
