@@ -1,7 +1,8 @@
 use std::collections::HashMap;
 
 pub fn tally(match_results: &str) -> String {
-    let mut heading = "Team                           | MP |  W |  D |  L |  P".to_string();
+    let width = 31;
+    let mut heading = format!("{:width$}| MP |  W |  D |  L |  P", "Team");
 
     if match_results.is_empty() {
         return heading
@@ -90,11 +91,10 @@ pub fn tally(match_results: &str) -> String {
         }
     });
 
-
     for (&team, value) in entries.iter() {
         heading.push_str(
             format!(
-                "\n{:<5}|  {} |  {} |  {} |  {} |  {}",
+                "\n{:width$}|  {} |  {} |  {} |  {} |  {}",
                 team,
                 value[0],
                 value[1],
