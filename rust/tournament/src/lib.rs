@@ -94,7 +94,8 @@ pub fn tally(match_results: &str) -> String {
     for (&team, value) in entries.iter() {
         heading.push_str(
             format!(
-                "\n{team}             |  {} |  {} |  {} |  {} |  {}",
+                "\n{}    |  {} |  {} |  {} |  {} |  {}",
+                team,
                 value[0],
                 value[1],
                 value[2],
