@@ -52,7 +52,6 @@ fn there_can_be_more_than_one_match() {
 }
 
 #[test]
-#[ignore]
 fn a_draw_is_one_point_each() {
     let input = "Allegoric Alaskans;Blithering Badgers;draw\n".to_string()
         + "Allegoric Alaskans;Blithering Badgers;win";
@@ -65,7 +64,6 @@ fn a_draw_is_one_point_each() {
 }
 
 #[test]
-#[ignore]
 fn there_can_be_more_than_one_winner() {
     let input = "Allegoric Alaskans;Blithering Badgers;loss\n".to_string()
         + "Allegoric Alaskans;Blithering Badgers;win";
@@ -78,7 +76,6 @@ fn there_can_be_more_than_one_winner() {
 }
 
 #[test]
-#[ignore]
 fn there_can_be_more_than_two_teams() {
     let input = "Allegoric Alaskans;Blithering Badgers;win\n".to_string()
         + "Blithering Badgers;Courageous Californians;win\n"
