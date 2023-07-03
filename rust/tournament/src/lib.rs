@@ -25,10 +25,6 @@ pub fn tally(match_results: &str) -> String {
             counter_hmap.entry(team2).or_insert(vec![0u8;5]);
 
             match condition {
-                /*
-                Have to change the format!() position,
-                at the end sort it out according to the points
-                the team scored*/
                  "win" => {
                     if let Some(v) = counter_hmap
                         .get_mut(team1) {
@@ -76,13 +72,13 @@ pub fn tally(match_results: &str) -> String {
                 _ => panic!("Unknown condition")
             }
         });
-
+    
     // Extract the entries into a vector
     let mut entries: Vec<(&&str, &Vec<u8>)> = counter_hmap.iter().collect();
 
     // Sort the vector based on the 4th index of the Vec<u8>
     entries.sort_by(|&(k1, v1), &(k2, v2)| {
-        let cmp = v2.get(3).cmp(&v1.get(3));
+        let cmp = v1.get(4).cmp(&v2.get(4));
         if cmp == std::cmp::Ordering::Equal {
             k1.cmp(k2)
         }
