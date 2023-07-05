@@ -1,105 +1,111 @@
 use std::collections::HashMap;
 
-pub fn tally(match_results: &str) -> String {
-    let width = 31;
-    let mut heading = format!("{:width$}| MP |  W |  D |  L |  P", "Team");
+const HEADER: &str = "Team                           | MP |  W |  D |  L |  P";
 
-    if match_results.is_empty() {
-        return heading
+#[derive(Default, Eq, PartialEq)]
+struct Team {
+    name: String,
+    matches: u8,
+    wins: u8,
+    draws: u8,
+    losses: u8,
+    points: u16,
+}
+
+impl Team {
+    fn new(name: String) -> Self {
+        Self {
+            name,
+            ..Default::default()
+        }
     }
 
-    let split_match_results = match_results
-                                                    .lines()
-                                                    .flat_map(|l| {
-                                                        l.split(';')
-                                                    })
-                                                    .collect::<Vec<&str>>();
+    fn win(&mut self) {
+        self.wins += 1;
+        self.matches += 1;
+        self.points += 3;
+    }
 
-    let mut counter_hmap: HashMap<&str, Vec<u8>> = HashMap::new();
+    fn lose(&mut self) {
+        self.losses += 1;
+        self.matches += 1;
+    }
 
-    split_match_results
-        .chunks(3)
-        .for_each(|team| {
-            let (team1, team2, condition) = (team[0], team[1], team[2]);
-            counter_hmap.entry(team1).or_insert(vec![0u8;5]);
-            counter_hmap.entry(team2).or_insert(vec![0u8;5]);
+    fn draw(&mut self) {
+        self.draws += 1;
+        self.matches += 1;
+        self.points += 1;
+    }
 
-            match condition {
-                 "win" => {
-                    if let Some(v) = counter_hmap
-                        .get_mut(team1) {
-                            v[0] += 1;
-                            v[1] += 1;
-                            v[4] += 3
-                        }
-
-                     if let Some(v) = counter_hmap
-                         .get_mut(team2) {
-                         v[0] += 1;
-                         v[3] += 1
-                     }
-                },
-                "loss" => {
-
-                    if let Some(v) = counter_hmap
-                        .get_mut(team1) {
-                        v[0] += 1;
-                        v[3] += 1;
-                    }
-
-                    if let Some(v) = counter_hmap
-                        .get_mut(team2) {
-                        v[0] += 1;
-                        v[1] += 1;
-                        v[4] += 3;
-                    }
-                },
-                "draw" => {
-                    if let Some(v) = counter_hmap
-                        .get_mut(team1) {
-                        v[0] += 1;
-                        v[2] += 1;
-                        v[4] += 1;
-                    }
-
-                    if let Some(v) = counter_hmap
-                        .get_mut(team2) {
-                        v[0] += 1;
-                        v[2] += 1;
-                        v[4] += 1;
-                    }
-                },
-                _ => panic!("Unknown condition")
-            }
-        });
-    
-    // Extract the entries into a vector
-    let mut entries: Vec<(&&str, &Vec<u8>)> = counter_hmap.iter().collect();
-
-    // Sort the vector based on the 4th index of the Vec<u8>
-    entries.sort_by(|&(k1, v1), &(k2, v2)| {
-        let cmp = v1.get(4).cmp(&v2.get(4));
-        if cmp == std::cmp::Ordering::Equal {
-            k1.cmp(k2)
+    fn add_match(&mut self, result: &MatchResult) {
+        match result {
+            MatchResult::Win => self.win(),
+            MatchResult::Loss => self.lose(),
+            MatchResult::Draw => self.draw(),
         }
-        else {
-            cmp.reverse()
-        }
-    });
+    }
+}
 
-    for (&team, value) in entries.iter() {
-        heading.push_str(
-            format!(
-                "\n{:width$}|  {} |  {} |  {} |  {} |  {}",
-                team,
-                value[0],
-                value[1],
-                value[2],
-                value[3],
-                value[4]
-            ).to_string().as_str()
+impl From<&Team> for String {
+    fn from(origin: &Team) -> String {
+        format!(
+            "{:<30} | {:>2} | {:>2} | {:>2} | {:>2} | {:>2}",
+            origin.name, origin.matches, origin.wins, origin.draws, origin.losses, origin.points
         )
     }
+}
 
-    heading
+enum MatchResult {
+    Win,
+    Loss,
+    Draw,
+}
+
+impl From<&str> for MatchResult {
+    fn from(origin: &str) -> MatchResult {
+        match origin {
+            "win" => MatchResult::Win,
+            "loss" => MatchResult::Loss,
+            "draw" => MatchResult::Draw,
+            _ => panic!()
+        }
+    }
+}
+
+impl MatchResult {
+    fn reverse(&self) -> Self {
+        match self {
+            MatchResult::Win => MatchResult::Loss,
+            MatchResult::Loss => MatchResult::Win,
+            MatchResult::Draw => MatchResult::Draw,
+        }
+    }
+}
+
+pub fn tally(match_results: &str) -> String {
+    let mut scores: HashMap<String, Team> = HashMap::new();
+    match_results.lines().for_each(|line| {
+        let frags: Vec<&str> = line.split(';').collect();
+        let home = frags[0];
+        let away = frags[1];
+        let result = frags[2].into();
+
+        scores
+            .entry(home.into())
+            .or_insert(Team::new(home.into()))
+            .add_match(&result);
+        scores
+            .entry(away.into())
+            .or_insert(Team::new(away.into()))
+            .add_match(&result.reverse());
+    });
+
+    let mut score_values: Vec<&Team> = scores.values().collect();
+    score_values.sort_by(|a, b| b.points.cmp(&a.points).then_with(|| a.name.cmp(&b.name)));
+
+    vec![String::from(HEADER)]
+        .into_iter()
+        .chain(score_values.into_iter().map(|t| t.into()))
+        .collect::<Vec<String>>()
+        .join("\n")
 }
