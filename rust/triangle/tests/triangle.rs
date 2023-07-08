@@ -36,7 +36,6 @@ fn one_length_zero_side_third() {
 }
 
 #[test]
-#[ignore]
 fn equilateral_triangles_have_equal_sides() {
     let sides = [2, 2, 2];
     let triangle = Triangle::build(sides).unwrap();
@@ -45,7 +44,6 @@ fn equilateral_triangles_have_equal_sides() {
 }
 
 #[test]
-#[ignore]
 fn larger_equilateral_triangles_have_equal_sides() {
     let sides = [10, 10, 10];
     let triangle = Triangle::build(sides).unwrap();
@@ -54,7 +52,6 @@ fn larger_equilateral_triangles_have_equal_sides() {
 }
 
 #[test]
-#[ignore]
 fn isosceles_triangles_have_two_equal_sides_one() {
     let sides = [3, 4, 4];
     let triangle = Triangle::build(sides).unwrap();
@@ -64,7 +61,6 @@ fn isosceles_triangles_have_two_equal_sides_one() {
 }
 
 #[test]
-#[ignore]
 fn isosceles_triangles_have_two_equal_sides_two() {
     let sides = [4, 4, 3];
     let triangle = Triangle::build(sides).unwrap();
@@ -74,7 +70,6 @@ fn isosceles_triangles_have_two_equal_sides_two() {
 }
 
 #[test]
-#[ignore]
 fn isosceles_triangles_have_two_equal_sides_three() {
     let sides = [4, 3, 4];
     let triangle = Triangle::build(sides).unwrap();
@@ -84,7 +79,6 @@ fn isosceles_triangles_have_two_equal_sides_three() {
 }
 
 #[test]
-#[ignore]
 fn isosceles_triangles_have_two_equal_sides_four() {
     let sides = [4, 7, 4];
     let triangle = Triangle::build(sides).unwrap();
@@ -94,7 +88,6 @@ fn isosceles_triangles_have_two_equal_sides_four() {
 }
 
 #[test]
-#[ignore]
 fn scalene_triangle_has_no_equal_sides_one() {
     let sides = [3, 4, 5];
     let triangle = Triangle::build(sides).unwrap();
@@ -104,7 +97,6 @@ fn scalene_triangle_has_no_equal_sides_one() {
 }
 
 #[test]
-#[ignore]
 fn scalene_triangle_has_no_equal_sides_two() {
     let sides = [5, 4, 6];
     let triangle = Triangle::build(sides).unwrap();
@@ -114,7 +106,6 @@ fn scalene_triangle_has_no_equal_sides_two() {
 }
 
 #[test]
-#[ignore]
 fn scalene_triangle_has_no_equal_sides_three() {
     let sides = [10, 11, 12];
     let triangle = Triangle::build(sides).unwrap();
@@ -124,7 +115,6 @@ fn scalene_triangle_has_no_equal_sides_three() {
 }
 
 #[test]
-#[ignore]
 fn scalene_triangle_has_no_equal_sides_four() {
     let sides = [5, 4, 2];
     let triangle = Triangle::build(sides).unwrap();

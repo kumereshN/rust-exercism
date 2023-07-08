@@ -1,22 +1,34 @@
-pub struct Triangle(u64,u64,u64);
+pub struct Triangle{
+    sides: [u64; 3]
+}
 
 impl Triangle {
+
+    pub fn new(sides: [u64; 3]) -> Triangle {
+        Triangle {
+            sides
+        }
+    }
+
     pub fn build(sides: [u64; 3]) -> Option<Triangle> {
+        let mut sides = sides;
+        sides.sort_unstable();
         if sides.iter().all(|&n| n > 0) {
-            return Some(Triangle(sides[0], sides[1], sides[2]))
+            let t = Triangle::new(sides);
+            return Some(t)
         }
         None
     }
 
     pub fn is_equilateral(&self) -> bool {
-        unimplemented!("Determine if the Triangle is equilateral.");
+        self.sides.windows(2).all(|n| n[0] == n[1])
     }
 
     pub fn is_scalene(&self) -> bool {
-        unimplemented!("Determine if the Triangle is scalene.");
+        self.sides.windows(2).all(|n| n[0] != n[1])
     }
 
     pub fn is_isosceles(&self) -> bool {
-        unimplemented!("Determine if the Triangle is isosceles.");
+        self.sides.windows(2).any(|n| n[0] == n[1])
     }
 }
