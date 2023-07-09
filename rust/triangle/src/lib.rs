@@ -1,33 +1,16 @@
-use itertools::Itertools;
-
-fn sum_of_any_two_sides_eq_or_greater_than_remaining_one_side(sides: &[u64; 3]) -> bool {
-    let permutations = sides.iter().permutations(3);
-    permutations
-        .map(|x| {
-            let total_sum = x[0] + x[1];
-            total_sum >= *x[2]
-        })
-        .all(|b| b)
+pub struct Triangle<T>
+{
+    sides: [T; 3]
 }
 
-pub struct Triangle{
-    sides: [u64; 3]
-}
-
-impl Triangle {
-
-    fn new(sides: [u64; 3]) -> Triangle {
-        Triangle {
-            sides
-        }
-    }
-
-    pub fn build(sides: [u64; 3]) -> Option<Triangle> {
+impl<T> Triangle<T>
+    where T: Copy + std::ops::Add<Output = T> + PartialOrd
+{
+    pub fn build(sides: [T; 3]) -> Option<Triangle<T>> {
         let mut sides = sides;
-        sides.sort_unstable();
-        if sides.iter().all(|&n| n > 0) && sum_of_any_two_sides_eq_or_greater_than_remaining_one_side(&sides) {
-            let t = Triangle::new(sides);
-            return Some(t)
+        sides.sort_by(|a, b| a.partial_cmp(b).unwrap());
+        if sides[0] + sides[1] > sides[2] {
+            return Some(Self { sides })
         }
         None
     }
