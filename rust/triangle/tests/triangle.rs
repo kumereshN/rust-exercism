@@ -124,7 +124,6 @@ fn scalene_triangle_has_no_equal_sides_four() {
 }
 
 #[test]
-#[ignore]
 fn sum_of_two_sides_must_equal_or_exceed_the_remaining_side_one() {
     let sides = [7, 3, 2];
     let triangle = Triangle::build(sides);
@@ -132,7 +131,6 @@ fn sum_of_two_sides_must_equal_or_exceed_the_remaining_side_one() {
 }
 
 #[test]
-#[ignore]
 fn sum_of_two_sides_must_equal_or_exceed_the_remaining_side_two() {
     let sides = [1, 1, 3];
     let triangle = Triangle::build(sides);
