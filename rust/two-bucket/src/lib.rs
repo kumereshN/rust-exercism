@@ -16,15 +16,15 @@ pub struct BucketStats {
     pub other_bucket: u8,
 }
 
-pub struct BucketCapacity {
-    BucketName: &Bucket,
+pub struct BucketCapacity<'a> {
+    BucketName: &'a Bucket,
     Capacity: u8
 }
 
-impl BucketCapacity {
-    fn new(bucket_name: &Bucket, capacity: u8) -> BucketCapacity {
+impl<'a> BucketCapacity<'a> {
+    fn new(bucket_name: &'a Bucket, capacity: u8) -> BucketCapacity {
         Self {
-            BucketName: *bucket_name,
+            BucketName: bucket_name,
             Capacity: capacity,
         }
     }
@@ -37,7 +37,7 @@ pub fn solve(
     goal: u8,
     start_bucket: &Bucket,
 ) -> Option<BucketStats> {
-    let bucket_1 = BucketCapacity::new(start_bucket.clone(), capacity_1);
+    let bucket_1 = BucketCapacity::new(start_bucket, capacity_1);
     unimplemented!(
         "Given one bucket of capacity {capacity_1}, another of capacity {capacity_2}, starting with {start_bucket:?}, find pours to reach {goal}, or None if impossible"
     );
