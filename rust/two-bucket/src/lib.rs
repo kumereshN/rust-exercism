@@ -1,0 +1,44 @@
+#[derive(PartialEq, Eq, Debug)]
+pub enum Bucket {
+    One,
+    Two,
+}
+
+/// A struct to hold your results in.
+#[derive(PartialEq, Eq, Debug)]
+pub struct BucketStats {
+    /// The total number of "moves" it should take to reach the desired number of liters, including
+    /// the first fill.
+    pub moves: u8,
+    /// Which bucket should end up with the desired number of liters? (Either "one" or "two")
+    pub goal_bucket: Bucket,
+    /// How many liters are left in the other bucket?
+    pub other_bucket: u8,
+}
+
+pub struct BucketCapacity {
+    BucketName: &Bucket,
+    Capacity: u8
+}
+
+impl BucketCapacity {
+    fn new(bucket_name: &Bucket, capacity: u8) -> BucketCapacity {
+        Self {
+            BucketName: *bucket_name,
+            Capacity: capacity,
+        }
+    }
+}
+
+/// Solve the bucket problem
+pub fn solve(
+    capacity_1: u8,
+    capacity_2: u8,
+    goal: u8,
+    start_bucket: &Bucket,
+) -> Option<BucketStats> {
+    let bucket_1 = BucketCapacity::new(start_bucket.clone(), capacity_1);
+    unimplemented!(
+        "Given one bucket of capacity {capacity_1}, another of capacity {capacity_2}, starting with {start_bucket:?}, find pours to reach {goal}, or None if impossible"
+    );
+}
