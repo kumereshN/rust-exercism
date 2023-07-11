@@ -77,14 +77,17 @@ pub fn solve(
 
             Bucket::Two => {
                 BucketCapacity::fill_bucket(&mut bucket_2, capacity_2);
+
             }
         }
 
         Some(
             BucketStats {
                 moves,
-                goal_bucket: Bucket::One,
-                other_bucket: bucket_2.water_remaining
+                goal_bucket: if bucket_1.water_remaining == goal { Bucket::One } else { Bucket::Two },
+                other_bucket: if bucket_1.water_remaining == goal { bucket_2.water_remaining } else { bucket_1.water_remaining }
             }
         )
+
+
     }
