@@ -1,3 +1,5 @@
+use std::cmp::max;
+
 #[derive(PartialEq, Eq, Debug)]
 pub enum Bucket {
     One,
@@ -40,11 +42,12 @@ impl<'a> BucketCapacity<'a> {
     }
 
     fn pour_from_one_bucket_to_another(from_bucket: &'a mut BucketCapacity, to_bucket: &'a mut BucketCapacity, water_to_pour: u8) {
-        from_bucket.water_remaining = from_bucket.water_remaining.saturating_sub(to_bucket.water_remaining);
+        let max_water_to_pour = to_bucket.capacity.saturating_sub(from_bucket.water_remaining);
         if to_bucket.water_remaining + water_to_pour > to_bucket.capacity {
-            let remaining_water_to_pour = to_bucket.capacity - water_to_pour;
-            to_bucket.capacity += remaining_water_to_pour;
+            from_bucket.water_remaining -= max_water_to_pour;
+            to_bucket.water_remaining += max_water_to_pour;
         } else {
+            from_bucket.water_remaining -= water_to_pour;
             to_bucket.water_remaining += water_to_pour;
         }
     }
@@ -60,19 +63,28 @@ pub fn solve(
         let mut bucket_1 = BucketCapacity::new(&Bucket::One, capacity_1);
         let mut bucket_2 = BucketCapacity::new(&Bucket::Two, capacity_2);
 
-        BucketCapacity::fill_bucket(&mut bucket_1, 5);
-        BucketCapacity::fill_bucket(&mut bucket_2, 8);
+        let mut moves = 0u8;
 
-        BucketCapacity::pour_from_one_bucket_to_another(&mut bucket_2, &mut bucket_1, 2);
-        BucketCapacity::empty_bucket(&mut bucket_1);
+        match start_bucket {
+            Bucket::One => {
+                while bucket_1.water_remaining.ne(&goal) && bucket_2.water_remaining.ne(&goal) {
+                    BucketCapacity::fill_bucket(&mut bucket_1, capacity_1);
+                    moves += 1;
+                    BucketCapacity::pour_from_one_bucket_to_another(&mut bucket_1, &mut bucket_2, capacity_1);
+                    moves += 1;
+                }
+            }
 
-
+            Bucket::Two => {
+                BucketCapacity::fill_bucket(&mut bucket_2, capacity_2);
+            }
+        }
 
         Some(
             BucketStats {
-                moves: 0,
+                moves,
                 goal_bucket: Bucket::One,
-                other_bucket: bucket_1.water_remaining
+                other_bucket: bucket_2.water_remaining
             }
         )
     }
