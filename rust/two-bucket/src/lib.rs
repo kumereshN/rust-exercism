@@ -1,4 +1,4 @@
-use std::cmp::max;
+use std::cmp::{max, Ordering};
 
 #[derive(PartialEq, Eq, Debug)]
 pub enum Bucket {
@@ -23,6 +23,7 @@ pub struct BucketCapacity<'a> {
     capacity: u8,
     water_remaining: u8,
 }
+
 
 impl<'a> BucketCapacity<'a> {
     fn new(bucket_name: &'a Bucket, capacity: u8) -> BucketCapacity {
@@ -63,7 +64,9 @@ pub fn solve(
         let mut bucket_1 = BucketCapacity::new(&Bucket::One, capacity_1);
         let mut bucket_2 = BucketCapacity::new(&Bucket::Two, capacity_2);
 
-        let mut moves = 0u8;
+        let ordering = bucket_1.water_remaining.cmp(&bucket_2.water_remaining);
+
+        let mut moves: u8 = 0;
 
         match start_bucket {
             Bucket::One => {
