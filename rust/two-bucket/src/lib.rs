@@ -43,6 +43,8 @@ impl<'a> BucketCapacity<'a> {
         bucket.water_remaining = 0
     }
 
+    fn is_full_bucket(bucket: &'a mut BucketCapacity) -> bool { bucket.water_remaining == bucket.capacity }
+
     fn is_empty_bucket(bucket: &'a mut BucketCapacity) -> bool { bucket.water_remaining == 0}
 
     fn pour_from_one_bucket_to_another(from_bucket: &'a mut BucketCapacity, to_bucket: &'a mut BucketCapacity) {
@@ -85,8 +87,22 @@ pub fn solve(
                 moves +=1;
 
                 while start_bucket_struct.water_remaining != goal && other_bucket_struct.water_remaining != goal {
-                    BucketCapacity::pour_from_one_bucket_to_another(&mut start_bucket_struct, &mut other_bucket_struct);
-                    moves += 1;
+
+                    if BucketCapacity::is_empty_bucket(&mut start_bucket_struct) {
+                        BucketCapacity::fill_bucket(& mut start_bucket_struct);
+                        moves += 1;
+                    }
+
+                    match BucketCapacity::is_full_bucket(&mut other_bucket_struct) {
+                        true => {
+                            BucketCapacity::empty_bucket(&mut other_bucket_struct);
+                            moves += 1;
+                        },
+                        false => {
+                            BucketCapacity::pour_from_one_bucket_to_another(&mut start_bucket_struct, &mut other_bucket_struct);
+                            moves += 1;
+                        }
+                    }
                 }
             },
             Ordering::Equal => {}
