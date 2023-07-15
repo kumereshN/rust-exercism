@@ -1,4 +1,4 @@
-use std::cmp::{max, Ordering};
+use std::cmp::{Ordering};
 
 #[derive(PartialEq, Eq, Debug)]
 pub enum Bucket {
@@ -34,22 +34,25 @@ impl<'a> BucketCapacity<'a> {
         }
     }
 
-    fn fill_bucket(bucket: &'a mut BucketCapacity, water_to_fill: u8) {
-        bucket.water_remaining += water_to_fill;
+    fn fill_bucket(bucket: &'a mut BucketCapacity) {
+        let water_to_pour = bucket.capacity.saturating_sub(bucket.water_remaining);
+        bucket.water_remaining += water_to_pour;
     }
 
     fn empty_bucket(bucket: &'a mut BucketCapacity) {
         bucket.water_remaining = 0
     }
 
-    fn pour_from_one_bucket_to_another(from_bucket: &'a mut BucketCapacity, to_bucket: &'a mut BucketCapacity, water_to_pour: u8) {
+    fn is_empty_bucket(bucket: &'a mut BucketCapacity) -> bool { bucket.water_remaining == 0}
+
+    fn pour_from_one_bucket_to_another(from_bucket: &'a mut BucketCapacity, to_bucket: &'a mut BucketCapacity) {
         let max_water_to_pour = to_bucket.capacity.saturating_sub(from_bucket.water_remaining);
-        if to_bucket.water_remaining + water_to_pour > to_bucket.capacity {
+        if from_bucket.water_remaining + to_bucket.water_remaining > to_bucket.capacity {
             from_bucket.water_remaining -= max_water_to_pour;
             to_bucket.water_remaining += max_water_to_pour;
         } else {
-            from_bucket.water_remaining -= water_to_pour;
-            to_bucket.water_remaining += water_to_pour;
+            to_bucket.water_remaining += from_bucket.water_remaining;
+            from_bucket.water_remaining = 0;
         }
     }
 }
@@ -61,36 +64,39 @@ pub fn solve(
     goal: u8,
     start_bucket: &Bucket,
 ) -> Option<BucketStats> {
-        let mut bucket_1 = BucketCapacity::new(&Bucket::One, capacity_1);
-        let mut bucket_2 = BucketCapacity::new(&Bucket::Two, capacity_2);
+        let mut start_bucket_struct = BucketCapacity::new(start_bucket, capacity_1);
+        let mut other_bucket_struct = BucketCapacity::new(if start_bucket == &Bucket::Two {&Bucket::One} else {&Bucket::Two}, capacity_2);
 
-        let ordering = bucket_1.water_remaining.cmp(&bucket_2.water_remaining);
+        let bucket_capacity_cmp = start_bucket_struct.capacity.cmp(&other_bucket_struct.capacity);
 
         let mut moves: u8 = 0;
 
-        match start_bucket {
-            Bucket::One => {
-                while bucket_1.water_remaining.ne(&goal) && bucket_2.water_remaining.ne(&goal) {
-                    BucketCapacity::fill_bucket(&mut bucket_1, capacity_1);
-                    moves += 1;
-                    BucketCapacity::pour_from_one_bucket_to_another(&mut bucket_1, &mut bucket_2, capacity_1);
+        match bucket_capacity_cmp {
+            Ordering::Less => {
+                while start_bucket_struct.water_remaining != goal && other_bucket_struct.water_remaining != goal {
+                    BucketCapacity::fill_bucket(&mut start_bucket_struct);
+                    moves +=1;
+                    BucketCapacity::pour_from_one_bucket_to_another(&mut start_bucket_struct, &mut other_bucket_struct);
                     moves += 1;
                 }
-            }
+            },
+            Ordering::Greater => {
+                BucketCapacity::fill_bucket(& mut start_bucket_struct);
+                moves +=1;
 
-            Bucket::Two => {
-                BucketCapacity::fill_bucket(&mut bucket_2, capacity_2);
-
-            }
+                while start_bucket_struct.water_remaining != goal && other_bucket_struct.water_remaining != goal {
+                    BucketCapacity::pour_from_one_bucket_to_another(&mut start_bucket_struct, &mut other_bucket_struct);
+                    moves += 1;
+                }
+            },
+            Ordering::Equal => {}
         }
 
         Some(
             BucketStats {
                 moves,
-                goal_bucket: if bucket_1.water_remaining == goal { Bucket::One } else { Bucket::Two },
-                other_bucket: if bucket_1.water_remaining == goal { bucket_2.water_remaining } else { bucket_1.water_remaining }
+                goal_bucket: if start_bucket_struct.water_remaining == goal { Bucket::One } else { Bucket::Two },
+                other_bucket: if start_bucket_struct.water_remaining == goal { other_bucket_struct.water_remaining } else { start_bucket_struct.water_remaining }
             }
         )
-
-
     }
