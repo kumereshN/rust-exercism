@@ -1,5 +1,3 @@
-use std::cmp::{Ordering};
-
 #[derive(PartialEq, Eq, Debug, Copy, Clone)]
 pub enum Bucket {
     One,
@@ -66,6 +64,14 @@ impl<'a> BucketCapacity<'a> {
             from_bucket.water_remaining = 0;
         }
     }
+
+    fn check_if_cannot_reach_goal(capacity_1: u8, capacity_2: u8, goal: u8) -> bool {
+        let capacity_vec = vec![capacity_1, capacity_2];
+        let max_capacity = capacity_vec.iter().max().unwrap();
+        let min_capacity = capacity_vec.iter().min().unwrap();
+
+       capacity_vec.iter().all(|&c| c != goal) && (max_capacity - min_capacity) % goal != 0
+    }
 }
 
 /// Solve the bucket problem
@@ -75,6 +81,11 @@ pub fn solve(
     goal: u8,
     start_bucket: &Bucket,
 ) -> Option<BucketStats> {
+
+        if BucketCapacity::check_if_cannot_reach_goal(capacity_1, capacity_2, goal) {
+            return None
+        }
+
         let mut start_bucket_struct = BucketCapacity::new(start_bucket, if start_bucket == &Bucket::One {capacity_1} else {capacity_2});
         let mut other_bucket_struct = BucketCapacity::new(if start_bucket == &Bucket::Two {&Bucket::One} else {&Bucket::Two}, if start_bucket == &Bucket::One {capacity_2} else {capacity_1});
 
@@ -85,7 +96,7 @@ pub fn solve(
         while start_bucket_struct.water_remaining != goal && other_bucket_struct.water_remaining != goal {
 
             if BucketCapacity::is_empty_bucket(&mut start_bucket_struct) {
-                BucketCapacity::fill_bucket(& mut start_bucket_struct);
+                BucketCapacity::fill_bucket(&mut start_bucket_struct);
                 moves += 1;
             }
 
@@ -95,6 +106,12 @@ pub fn solve(
                     moves += 1;
                 },
                 false => {
+                    if other_bucket_struct.capacity == goal {
+                        BucketCapacity::fill_bucket(&mut other_bucket_struct);
+                        moves += 1;
+                        break
+                    }
+
                     BucketCapacity::pour_from_one_bucket_to_another(&mut start_bucket_struct, &mut other_bucket_struct);
                     moves += 1;
                 }

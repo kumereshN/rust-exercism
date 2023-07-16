@@ -61,7 +61,6 @@ fn goal_equal_to_start_bucket() {
 }
 
 #[test]
-#[ignore]
 fn goal_equal_to_other_bucket() {
     assert_eq!(
         solve(2, 3, 3, &Bucket::One),
@@ -74,7 +73,6 @@ fn goal_equal_to_other_bucket() {
 }
 
 #[test]
-#[ignore]
 fn not_possible_to_reach_the_goal() {
     assert_eq!(solve(6, 15, 5, &Bucket::One), None);
 }
