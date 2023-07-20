@@ -3,7 +3,7 @@ use variable_length_quantity as vlq;
 #[test]
 fn test_binary_rep() {
     // This is my personal test. You can remove it later
-    assert_eq!(vec!["hello"], vlq::to_bytes(&[0x81, 0x00]))
+    assert_eq!(&[0x00], vlq::to_bytes(&[0x00]).as_slice());
 }
 
 /*#[test]

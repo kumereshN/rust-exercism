@@ -7,7 +7,7 @@ pub enum Error {
 }
 
 /// Convert a list of numbers to a stream of bytes encoded with variable length encoding.
-pub fn to_bytes(values: &[u32]) -> Vec<String> {
+pub fn to_bytes(values: &[u32]) -> Vec<u8> {
     // Original return value should be Vec<u8>. Change it later when you're done.
     let concat_binary_string = values
         .iter()
@@ -17,18 +17,8 @@ pub fn to_bytes(values: &[u32]) -> Vec<String> {
         .collect::<Vec<String>>()
         .join("");
 
-    let len_concat_binary_string = concat_binary_string.len();
 
-    if len_concat_binary_string % 7 == 0 {
-        let windows = 7;
-        let vec_string = concat_binary_string
-            .chars()
-            .rev()
-            .collect::<Vec<char>>()
-            .chunks(7);
-    }
-
-    vec![concat_binary_string]
+    concat_binary_string.as_bytes().to_vec()
 }
 
 /// Given a stream of bytes, extract all numbers which are encoded in there.
