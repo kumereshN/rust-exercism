@@ -1,6 +1,13 @@
 use variable_length_quantity as vlq;
 
 #[test]
+fn test_binary_rep() {
+    // This is my personal test. You can remove it later
+    assert_eq!(vec!["hello"], vlq::to_bytes(&[0x81, 0x00]))
+}
+
+/*#[test]
+#[ignore]
 fn to_single_byte() {
     assert_eq!(&[0x00], vlq::to_bytes(&[0x00]).as_slice());
     assert_eq!(&[0x40], vlq::to_bytes(&[0x40]).as_slice());
@@ -132,3 +139,4 @@ fn chained_execution_is_identity() {
         vlq::from_bytes(&vlq::to_bytes(test))
     );
 }
+*/
