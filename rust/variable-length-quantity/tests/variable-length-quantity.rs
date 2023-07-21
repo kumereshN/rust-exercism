@@ -1,13 +1,6 @@
 use variable_length_quantity as vlq;
 
 #[test]
-fn test_binary_rep() {
-    // This is my personal test. You can remove it later
-    assert_eq!(&[0x00], vlq::to_bytes(&[0x00]).as_slice());
-}
-
-/*#[test]
-#[ignore]
 fn to_single_byte() {
     assert_eq!(&[0x00], vlq::to_bytes(&[0x00]).as_slice());
     assert_eq!(&[0x40], vlq::to_bytes(&[0x40]).as_slice());
@@ -15,7 +8,6 @@ fn to_single_byte() {
 }
 
 #[test]
-#[ignore]
 fn to_double_byte() {
     assert_eq!(&[0x81, 0x00], vlq::to_bytes(&[0x80]).as_slice());
     assert_eq!(&[0xc0, 0x00], vlq::to_bytes(&[0x2000]).as_slice());
@@ -23,7 +15,6 @@ fn to_double_byte() {
 }
 
 #[test]
-#[ignore]
 fn to_triple_byte() {
     assert_eq!(&[0x81, 0x80, 0x00], vlq::to_bytes(&[0x4000]).as_slice());
     assert_eq!(&[0xc0, 0x80, 0x00], vlq::to_bytes(&[0x10_0000]).as_slice());
@@ -31,7 +22,6 @@ fn to_triple_byte() {
 }
 
 #[test]
-#[ignore]
 fn to_quadruple_byte() {
     assert_eq!(
         &[0x81, 0x80, 0x80, 0x00],
@@ -48,7 +38,6 @@ fn to_quadruple_byte() {
 }
 
 #[test]
-#[ignore]
 fn to_quintuple_byte() {
     assert_eq!(
         &[0x81, 0x80, 0x80, 0x80, 0x00],
@@ -65,7 +54,6 @@ fn to_quintuple_byte() {
 }
 
 #[test]
-#[ignore]
 fn from_bytes() {
     assert_eq!(Ok(vec![0x7f]), vlq::from_bytes(&[0x7f]));
     assert_eq!(Ok(vec![0x2000]), vlq::from_bytes(&[0xc0, 0x00]));
@@ -81,7 +69,6 @@ fn from_bytes() {
 }
 
 #[test]
-#[ignore]
 fn to_bytes_multiple_values() {
     assert_eq!(&[0x40, 0x7f], vlq::to_bytes(&[0x40, 0x7f]).as_slice());
     assert_eq!(
@@ -98,7 +85,6 @@ fn to_bytes_multiple_values() {
 }
 
 #[test]
-#[ignore]
 fn from_bytes_multiple_values() {
     assert_eq!(
         Ok(vec![0x2000, 0x12_3456, 0x0fff_ffff, 0x00, 0x3fff, 0x4000]),
@@ -110,19 +96,16 @@ fn from_bytes_multiple_values() {
 }
 
 #[test]
-#[ignore]
 fn incomplete_byte_sequence() {
     assert_eq!(Err(vlq::Error::IncompleteNumber), vlq::from_bytes(&[0xff]));
 }
 
 #[test]
-#[ignore]
 fn zero_incomplete_byte_sequence() {
     assert_eq!(Err(vlq::Error::IncompleteNumber), vlq::from_bytes(&[0x80]));
 }
 
 #[test]
-#[ignore]
 fn overflow_u32() {
     assert_eq!(
         Err(vlq::Error::Overflow),
@@ -131,7 +114,6 @@ fn overflow_u32() {
 }
 
 #[test]
-#[ignore]
 fn chained_execution_is_identity() {
     let test = &[0xf2, 0xf6, 0x96, 0x9c, 0x3b, 0x39, 0x2e, 0x30, 0xb3, 0x24];
     assert_eq!(
@@ -139,4 +121,3 @@ fn chained_execution_is_identity() {
         vlq::from_bytes(&vlq::to_bytes(test))
     );
 }
-*/
