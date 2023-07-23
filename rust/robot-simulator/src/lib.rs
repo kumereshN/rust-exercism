@@ -24,7 +24,7 @@ impl Robot {
             Direction::South => self.2 = Direction::West,
             Direction::West => self.2 = Direction::North
         }
-        Self(self.0, self.1, self.2)
+        self
     }
 
     #[must_use]
@@ -35,7 +35,7 @@ impl Robot {
             Direction::South => self.2 = Direction::East,
             Direction::West => self.2 = Direction::South
         }
-        Self(self.0, self.1, self.2)
+        self
     }
 
     #[must_use]
@@ -47,12 +47,19 @@ impl Robot {
             Direction::West => self.0 -= 1
         }
 
-        Self(self.0, self.1, self.2)
+        self
     }
 
     #[must_use]
     pub fn instructions(self, instructions: &str) -> Self {
-        unimplemented!("Follow the given sequence of instructions: {instructions}")
+        instructions.chars().fold(self, |robot, instructions| {
+            match instructions {
+                'L' => robot.turn_left(),
+                'R' => robot.turn_right(),
+                'A' => robot.advance(),
+                _ => robot
+            }
+        })
     }
 
     pub fn position(&self) -> (i32, i32) {
