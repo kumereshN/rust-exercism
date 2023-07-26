@@ -1,9 +1,13 @@
 use std::collections::HashSet;
 use rand::{thread_rng};
 use rand::distributions::{Distribution, Uniform};
+
 pub struct Robot{
     robot_id: String,
-    seen: HashSet<String>
+}
+
+pub struct Seen {
+    seen_hashset: HashSet<String>
 }
 
 impl Default for Robot {
@@ -12,21 +16,21 @@ impl Default for Robot {
     }
 }
 
+impl Seen {
+    pub fn new() -> Self {
+        Self{ seen_hashset: HashSet::new()}
+    }
+}
 
 impl Robot {
-
     pub fn new() -> Self {
        let robot = Robot::create_robot();
-
-       while robot.seen.contains(robot.robot_id) {
-           
-       }
     }
 
     pub fn create_robot() -> Self {
         let step = Uniform::new_inclusive(0, 9);
         let chars = Uniform::new_inclusive('A', 'Z');
-        let mut seen = HashSet::new();
+        let mut seen = Seen::new();
 
         let mut rng = thread_rng();
 
@@ -34,8 +38,8 @@ impl Robot {
         let numbers = step.sample_iter(&mut rng).take(3).map(|n| n.to_string()).collect::<String>();
         let robot_id = format!("{chars}{numbers}");
 
-        seen.insert(robot_id.clone());
-        Self{robot_id, seen}
+        seen.seen_hashset.insert(robot_id.clone());
+        Self{robot_id}
     }
 
     pub fn name(&self) -> &str {
