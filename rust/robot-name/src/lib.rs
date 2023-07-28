@@ -1,6 +1,34 @@
-use rand::{thread_rng};
-use rand::distributions::{Alphanumeric, Distribution, DistString, Uniform};
-pub struct Robot(String);
+use lazy_static::lazy_static;
+use std::sync::atomic::{AtomicUsize, Ordering};
+
+// The lazy_static crate is used to ensure that the counter is initialized lazily and only once,
+// even if multiple instances of the Robot struct are created.
+lazy_static! {
+    static ref COUNTER: AtomicUsize = AtomicUsize::new(0);
+}
+
+pub struct Robot{
+    name: String,
+}
+
+fn next_count() -> usize {
+    COUNTER.fetch_add(1, Ordering::Relaxed)
+}
+
+fn next_name() -> String {
+    let count = next_count();
+    let alp = (count / 1000) as u32;
+    let first_char = char::from_u32('A' as u32 + alp / 26).unwrap();
+    let second_char = char::from_u32('A' as u32 + alp % 26).unwrap();
+    // Obtain the last 3 digits
+    let serial = count % 1000;
+
+    format!("{}{}{:0>3}",
+            first_char,
+            second_char,
+            serial
+    )
+}
 
 impl Default for Robot {
     fn default() -> Self {
@@ -10,19 +38,14 @@ impl Default for Robot {
 
 impl Robot {
     pub fn new() -> Self {
-        let step = Uniform::new_inclusive(0, 9);
-        let chars = Uniform::new_inclusive('A', 'Z');
-        let mut rng = thread_rng();
-        let chars = chars.sample_iter(&mut rng).take(2).map(|c| c.to_uppercase().to_string()).collect::<String>();
-        let numbers = step.sample_iter(&mut rng).take(3).map(|n| n.to_string()).collect::<String>();
-        Self(format!("{chars}{numbers}"))
+        Robot { name : next_name()}
     }
 
     pub fn name(&self) -> &str {
-        self.0.as_str()
+        &self.name
     }
 
     pub fn reset_name(&mut self) {
-        self.0 = Robot::new().0;
+        self.name = next_name();
     }
 }
