@@ -33,6 +33,40 @@
       <sourceFolder url="file://$MODULE_DIR$/rust/etl/tests" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/rust/isogram/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/rust/isogram/tests" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/rust/hamming/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/rust/hamming/tests" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/rust/nucleotide-count/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/rust/nucleotide-count/tests" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/rust/paasio/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/rust/paasio/tests" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/rust/pangram/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/rust/pangram/tests" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/rust/perfect-numbers/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/rust/perfect-numbers/tests" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/rust/pig-latin/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/rust/pig-latin/tests" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/rust/rna-transcription/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/rust/rna-transcription/tests" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/rust/robot-name/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/rust/robot-name/tests" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/rust/run-length-encoding/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/rust/run-length-encoding/tests" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/rust/saddle-points/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/rust/saddle-points/tests" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/rust/scrabble-score/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/rust/scrabble-score/tests" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/rust/sieve/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/rust/sieve/tests" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/rust/spiral-matrix/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/rust/spiral-matrix/tests" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/rust/tournament/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/rust/tournament/tests" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/rust/triangle/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/rust/triangle/tests" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/rust/two-bucket/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/rust/two-bucket/tests" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/rust/variable-length-quantity/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/rust/variable-length-quantity/tests" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/resistor-color/target" />
       <excludeFolder url="file://$MODULE_DIR$/allergies/target" />
       <excludeFolder url="file://$MODULE_DIR$/rust/magazine-cutout/target" />
@@ -49,6 +83,23 @@
       <excludeFolder url="file://$MODULE_DIR$/rust/binary-search/target" />
       <excludeFolder url="file://$MODULE_DIR$/rust/etl/target" />
       <excludeFolder url="file://$MODULE_DIR$/rust/isogram/target" />
+      <excludeFolder url="file://$MODULE_DIR$/rust/hamming/target" />
+      <excludeFolder url="file://$MODULE_DIR$/rust/nucleotide-count/target" />
+      <excludeFolder url="file://$MODULE_DIR$/rust/paasio/target" />
+      <excludeFolder url="file://$MODULE_DIR$/rust/pangram/target" />
+      <excludeFolder url="file://$MODULE_DIR$/rust/perfect-numbers/target" />
+      <excludeFolder url="file://$MODULE_DIR$/rust/pig-latin/target" />
+      <excludeFolder url="file://$MODULE_DIR$/rust/rna-transcription/target" />
+      <excludeFolder url="file://$MODULE_DIR$/rust/robot-name/target" />
+      <excludeFolder url="file://$MODULE_DIR$/rust/run-length-encoding/target" />
+      <excludeFolder url="file://$MODULE_DIR$/rust/saddle-points/target" />
+      <excludeFolder url="file://$MODULE_DIR$/rust/scrabble-score/target" />
+      <excludeFolder url="file://$MODULE_DIR$/rust/sieve/target" />
+      <excludeFolder url="file://$MODULE_DIR$/rust/spiral-matrix/target" />
+      <excludeFolder url="file://$MODULE_DIR$/rust/tournament/target" />
+      <excludeFolder url="file://$MODULE_DIR$/rust/triangle/target" />
+      <excludeFolder url="file://$MODULE_DIR$/rust/two-bucket/target" />
+      <excludeFolder url="file://$MODULE_DIR$/rust/variable-length-quantity/target" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
