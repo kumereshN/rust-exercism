@@ -7,35 +7,30 @@ fn just_a_number() {
 }
 
 #[test]
-#[ignore]
 fn addition() {
     let command = "What is 1 plus 1?";
     assert_eq!(Some(2), answer(command));
 }
 
 #[test]
-#[ignore]
 fn more_addition() {
     let command = "What is 53 plus 2?";
     assert_eq!(Some(55), answer(command));
 }
 
 #[test]
-#[ignore]
 fn addition_with_negative_numbers() {
     let command = "What is -1 plus -10?";
     assert_eq!(Some(-11), answer(command));
 }
 
 #[test]
-#[ignore]
 fn large_addition() {
     let command = "What is 123 plus 45678?";
     assert_eq!(Some(45_801), answer(command));
 }
 
 #[test]
-#[ignore]
 fn subtraction() {
     let command = "What is 4 minus -12?";
     assert_eq!(Some(16), answer(command));
