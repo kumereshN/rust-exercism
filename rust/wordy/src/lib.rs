@@ -15,8 +15,6 @@ impl From<&str> for Operations {
             "minus" => Operations::Minus,
             "multiplied" => Operations::Multiply,
             "divided" => Operations::Divide,
-            "cubed" => Operations::Unknown,
-            "exponent" => Operations::Unknown,
             _ => Operations::Invalid
         }
     }
@@ -69,8 +67,7 @@ pub fn answer(command: &str) -> Option<i32> {
         })
         .collect::<Vec<Operations>>();
 
-    if operations.iter().any(|o| *o == Operations::Unknown) ||
-        numbers.len().saturating_sub(1) != operations.len(){
+    if numbers.len().saturating_sub(1) != operations.len(){
         return None
     }
 
