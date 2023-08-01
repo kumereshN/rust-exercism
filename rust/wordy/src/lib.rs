@@ -23,8 +23,34 @@ impl From<&str> for Operations {
 }
 
 pub fn answer(command: &str) -> Option<i32> {
+    let command = command
+        .split(|c: char| c.is_ascii_whitespace() || c == '?')
+        .skip(2)
+        .collect::<Vec<&str>>()
+        .join(" ");
+
+    if command.is_empty() ||
+        command
+            .split_ascii_whitespace()
+            .take(1)
+            .next()
+            .unwrap()
+            .parse::<i32>()
+            .is_err() ||
+        command
+            .split_ascii_whitespace()
+            .collect::<Vec<&str>>()
+            .iter()
+            .last()
+            .unwrap()
+            .parse::<i32>()
+            .is_err()
+        {
+        return None
+    }
+
     let numbers = command
-        .split(|s| s == ' ' || s == '?')
+        .split_ascii_whitespace()
         .filter_map(|s| {
             match s.chars().any(|c| c.is_ascii_digit()) {
                 true => s.parse::<i32>().ok(),
@@ -34,7 +60,7 @@ pub fn answer(command: &str) -> Option<i32> {
         .collect::<Vec<i32>>();
 
     let operations = command
-        .split(|s| s == ' ' || s == '?')
+        .split_ascii_whitespace()
         .filter_map(|s| {
             match s.into() {
                 Operations::Invalid => None,
@@ -44,7 +70,7 @@ pub fn answer(command: &str) -> Option<i32> {
         .collect::<Vec<Operations>>();
 
     if operations.iter().any(|o| *o == Operations::Unknown) ||
-        numbers.len() <= operations.len(){
+        numbers.len().saturating_sub(1) != operations.len(){
         return None
     }
 
