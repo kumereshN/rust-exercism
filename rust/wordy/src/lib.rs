@@ -39,8 +39,6 @@ pub fn answer(command: &str) -> Option<i32> {
             .is_err() ||
         command
             .split_ascii_whitespace()
-            .collect::<Vec<&str>>()
-            .iter()
             .last()
             .unwrap()
             .chars()
