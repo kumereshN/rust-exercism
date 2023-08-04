@@ -40,16 +40,10 @@ impl<'a, T> CustomSet<'a, T>
     }
 
     pub fn is_disjoint(&self, _other: &Self) -> bool {
-        match (self.set.is_empty(), _other.set.is_empty()) {
-            (true, true) => true,
-            (true, false) => true,
-            (false, true) => true,
-            (_, _) => {
-                self.set
-                    .iter()
-                    .all(|n| !_other.contains(n))
-            }
-        }
+
+        self.set
+            .iter()
+            .all(|n| !_other.contains(n))
     }
 
     #[must_use]
