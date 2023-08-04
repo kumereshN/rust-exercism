@@ -23,16 +23,9 @@ impl<'a, T> CustomSet<'a, T>
     }
 
     pub fn is_subset(&self, _other: &Self) -> bool {
-        match (self.set.is_empty(), _other.set.is_empty()) {
-            (true, true) => true,
-            (true, false) => true,
-            (false, true) => false,
-            (_, _) => {
-                self.set
-                    .iter()
-                    .all(|n| _other.contains(n))
-            }
-        }
+        self.set
+            .iter()
+            .all(|n| _other.contains(n))
     }
 
     pub fn is_empty(&self) -> bool {
@@ -40,7 +33,6 @@ impl<'a, T> CustomSet<'a, T>
     }
 
     pub fn is_disjoint(&self, _other: &Self) -> bool {
-
         self.set
             .iter()
             .all(|n| !_other.contains(n))
