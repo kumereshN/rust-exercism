@@ -1,16 +1,18 @@
-use std::cmp;
-
-#[derive(Debug, PartialEq, Eq)]
-pub struct CustomSet<'a, T> {
-    set: &'a [T]
+#[derive(Debug, PartialEq, Eq, Ord, PartialOrd)]
+pub struct CustomSet<T>
+{
+    set: Vec<T>
 }
 
-impl<'a, T> CustomSet<'a, T>
-    where T:cmp::PartialEq
+impl<T> CustomSet<T>
+    where T: PartialEq + Ord + Clone
 {
-    pub fn new(_input: &'a [T]) -> Self {
+    pub fn new(_input: &[T]) -> Self {
+        let mut set = _input.to_vec();
+        set.sort_unstable();
+        set.dedup();
         Self {
-            set: _input,
+            set
         }
     }
 
@@ -19,7 +21,9 @@ impl<'a, T> CustomSet<'a, T>
     }
 
     pub fn add(&mut self, _element: T) {
-        unimplemented!();
+        self.set.extend([_element]);
+        self.set.sort_unstable();
+        self.set.dedup()
     }
 
     pub fn is_subset(&self, _other: &Self) -> bool {
