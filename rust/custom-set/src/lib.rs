@@ -44,7 +44,14 @@ impl<T> CustomSet<T>
 
     #[must_use]
     pub fn intersection(&self, _other: &Self) -> Self {
-        unimplemented!();
+        self
+            .set
+            .iter()
+            .filter_map(|n| match _other.contains(n) {
+                true => Some(n),
+                false => None
+            })
+            .collect()
     }
 
     #[must_use]

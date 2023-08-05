@@ -169,7 +169,6 @@ fn add_existing_element() {
 }
 
 #[test]
-#[ignore]
 fn intersecting_empty_sets_return_empty_set() {
     let set1: CustomSet<()> = CustomSet::new(&[]);
     let set2: CustomSet<()> = CustomSet::new(&[]);
