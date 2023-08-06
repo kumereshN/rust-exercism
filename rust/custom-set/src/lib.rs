@@ -54,7 +54,7 @@ impl<T> CustomSet<T>
             .clone()
             .into_iter()
             .filter(|n|
-                _other.contains(n))
+                !_other.contains(n))
             .collect::<Vec<_>>()
         )
     }
