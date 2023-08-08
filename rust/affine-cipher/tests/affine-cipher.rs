@@ -6,19 +6,16 @@ fn encode_yes() {
 }
 
 #[test]
-#[ignore]
 fn encode_no() {
     assert_eq!(encode("no", 15, 18).unwrap(), "fu")
 }
 
 #[test]
-#[ignore]
 fn encode_omg() {
     assert_eq!(encode("OMG", 21, 3).unwrap(), "lvz")
 }
 
 #[test]
-#[ignore]
 fn encode_o_m_g() {
     assert_eq!(encode("O M G", 25, 47).unwrap(), "hjp")
 }
@@ -39,7 +36,6 @@ fn encode_numbers() {
 }
 
 #[test]
-#[ignore]
 fn encode_deep_thought() {
     assert_eq!(
         encode("Truth is fiction", 5, 17).unwrap(),
