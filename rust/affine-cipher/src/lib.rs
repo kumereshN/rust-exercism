@@ -9,14 +9,15 @@ pub enum AffineCipherError {
 /// returning a return code, the more common convention in Rust is to return a `Result`.
 pub fn encode(plaintext: &str, a: i32, b: i32) -> Result<String, AffineCipherError> {
     let alphabets = ('a'..='z').collect::<String>();
+    let alphabets_len = alphabets.len() as i32;
     let encoded_string = plaintext
         .chars()
         .filter_map(|mut c| {
             c = c.to_ascii_lowercase();
             match (c.is_alphabetic(), c.is_numeric()) {
                 (true, false) => {
-                    let index_char = alphabets.chars().position(|x| x == c).unwrap();
-                    let e_no = (((a * index_char as i32) + b) %  26) as usize;
+                    let index_char = alphabets.chars().position(|x| x == c).unwrap()  as i32;
+                    let e_no = (((a * index_char) + b) %  alphabets_len) as usize;
                     alphabets.chars().nth(e_no)
                 }
                 (false, true) => {
@@ -24,7 +25,15 @@ pub fn encode(plaintext: &str, a: i32, b: i32) -> Result<String, AffineCipherErr
                 }
                 (_, _) => None
             }
-        }).collect::<String>();
+        })
+        .collect::<Vec<char>>()
+        .chunks(5)
+        .map(|s| {
+            format!("{} ", s.iter().collect::<String>())
+        })
+        .collect::<String>()
+        .trim_end()
+        .to_string();
 
     Ok(encoded_string)
 }
