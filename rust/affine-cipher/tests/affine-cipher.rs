@@ -68,10 +68,10 @@ fn decode_exercism() {
 
 #[test]
 fn decode_a_sentence() {
-/*    assert_eq!(
+    assert_eq!(
         encode("anobstacleisoftenasteppingstone", 19, 16).unwrap(),
         "qdwju nqcro muwhn odqun oppmd aunwd o"
-    );*/
+    );
     assert_eq!(
         decode("qdwju nqcro muwhn odqun oppmd aunwd o", 19, 16).unwrap(),
         "anobstacleisoftenasteppingstone"
@@ -79,7 +79,6 @@ fn decode_a_sentence() {
 }
 
 #[test]
-#[ignore]
 fn decode_numbers() {
     assert_eq!(
         decode("odpoz ub123 odpoz ub", 25, 7).unwrap(),
@@ -88,7 +87,6 @@ fn decode_numbers() {
 }
 
 #[test]
-#[ignore]
 fn decode_all_the_letters() {
     assert_eq!(
         decode("swxtj npvyk lruol iejdc blaxk swxmh qzglf", 17, 33).unwrap(),
@@ -97,7 +95,6 @@ fn decode_all_the_letters() {
 }
 
 #[test]
-#[ignore]
 fn decode_with_no_spaces_in_input() {
     assert_eq!(
         decode("swxtjnpvyklruoliejdcblaxkswxmhqzglf", 17, 33).unwrap(),
@@ -106,7 +103,6 @@ fn decode_with_no_spaces_in_input() {
 }
 
 #[test]
-#[ignore]
 fn decode_with_too_many_spaces() {
     assert_eq!(
         decode("vszzm    cly   yd cg    qdp", 15, 16).unwrap(),

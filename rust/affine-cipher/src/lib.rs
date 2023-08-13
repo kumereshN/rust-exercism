@@ -1,5 +1,4 @@
 use std::iter::Iterator;
-use std::ops::{Div};
 
 /// While the problem description indicates a return status of 1 should be returned on errors,
 /// it is much more common to return a `Result`, so we provide an error type for the result here.
@@ -45,7 +44,7 @@ pub fn encode(plaintext: &str, a: i32, b: i32) -> Result<String, AffineCipherErr
                     match (c.is_alphabetic(), c.is_numeric()) {
                         (true, false) => {
                             let index_char = alphabets.chars().position(|x| x == c).unwrap() as i32;
-                            let encoded_no = (((a * index_char) + b) %  alphabets_len) as usize;
+                            let encoded_no = (((a * index_char) + b).rem_euclid(alphabets_len)) as usize;
                             alphabets.chars().nth(encoded_no)
                         }
                         (false, true) => {
@@ -84,15 +83,7 @@ pub fn decode(ciphertext: &str, a: i32, b: i32) -> Result<String, AffineCipherEr
             match(c.is_alphabetic(), c.is_numeric()) {
                 (true, false) => {
                     let y = alphabets.chars().position(|x| x == c).unwrap() as i32;
-                    let mut decoded_value = mmi_value * (y - b);
-                    match decoded_value < 0 {
-                        true => {
-                            decoded_value = (decoded_value + alphabets_len) % alphabets_len;
-                        },
-                        false => {
-                            decoded_value %= alphabets_len;
-                        }
-                    }
+                    let decoded_value = (mmi_value * (y - b)).rem_euclid(alphabets_len);
                     alphabets.chars().nth(decoded_value as usize)
                 },
                 (false, true) => {
