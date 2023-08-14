@@ -38,9 +38,9 @@ pub fn encode(plaintext: &str, a: i32, b: i32) -> Result<String, AffineCipherErr
     match is_coprime(a, alphabets_len) {
         true => {
             Ok(plaintext
+                .to_ascii_lowercase()
                 .chars()
-                .filter_map(|mut c| {
-                    c = c.to_ascii_lowercase();
+                .filter_map(|c| {
                     match (c.is_alphabetic(), c.is_numeric()) {
                         (true, false) => {
                             let index_char = alphabets.chars().position(|x| x == c).unwrap() as i32;
@@ -56,10 +56,10 @@ pub fn encode(plaintext: &str, a: i32, b: i32) -> Result<String, AffineCipherErr
                 .collect::<Vec<char>>()
                 .chunks(5)
                 .map(|s| {
-                    format!("{} ", s.iter().collect::<String>())
+                    s.iter().collect::<String>()
                 })
-                .collect::<String>()
-                .trim_end()
+                .collect::<Vec<String>>()
+                .join(" ")
                 .to_string()
             )
         },
@@ -79,9 +79,9 @@ pub fn decode(ciphertext: &str, a: i32, b: i32) -> Result<String, AffineCipherEr
         true => {
             let mmi_value = calculate_mmi(a, alphabets_len);
             Ok(ciphertext
+                .to_ascii_lowercase()
                 .chars()
-                .filter_map(|mut c| {
-                    c = c.to_ascii_lowercase();
+                .filter_map(|c| {
                     match (c.is_alphabetic(), c.is_numeric()) {
                         (true, false) => {
                             let y = alphabets.chars().position(|x| x == c).unwrap() as i32;
