@@ -74,26 +74,33 @@ pub fn encode(plaintext: &str, a: i32, b: i32) -> Result<String, AffineCipherErr
 pub fn decode(ciphertext: &str, a: i32, b: i32) -> Result<String, AffineCipherError> {
     let alphabets = ('a'..='z').collect::<String>();
     let alphabets_len = alphabets.len() as i32;
-    let mmi_value = calculate_mmi(a, alphabets_len);
 
-    Ok(ciphertext
-        .chars()
-        .filter_map(|mut c| {
-            c = c.to_ascii_lowercase();
-            match(c.is_alphabetic(), c.is_numeric()) {
-                (true, false) => {
-                    let y = alphabets.chars().position(|x| x == c).unwrap() as i32;
-                    let decoded_value = (mmi_value * (y - b)).rem_euclid(alphabets_len);
-                    alphabets.chars().nth(decoded_value as usize)
-                },
-                (false, true) => {
-                    Some(c)
-                },
-                (_, _) => {
-                    None
-                }
-            }
-        })
-        .collect::<String>()
-    )
+    match is_coprime(a, alphabets_len) {
+        true => {
+            let mmi_value = calculate_mmi(a, alphabets_len);
+            Ok(ciphertext
+                .chars()
+                .filter_map(|mut c| {
+                    c = c.to_ascii_lowercase();
+                    match (c.is_alphabetic(), c.is_numeric()) {
+                        (true, false) => {
+                            let y = alphabets.chars().position(|x| x == c).unwrap() as i32;
+                            let decoded_value = (mmi_value * (y - b)).rem_euclid(alphabets_len);
+                            alphabets.chars().nth(decoded_value as usize)
+                        },
+                        (false, true) => {
+                            Some(c)
+                        },
+                        (_, _) => {
+                            None
+                        }
+                    }
+                })
+                .collect::<String>()
+            )
+        },
+        false => {
+            Err(AffineCipherError::NotCoprime(a))
+        }
+    }
 }
