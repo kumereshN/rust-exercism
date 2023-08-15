@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-fn map_chars(text: &str, a_map: HashMap<char, char>) -> String {
+fn map_chars(text: &str, a_map: HashMap<char, char>) -> Vec<char> {
     text
         .to_ascii_lowercase()
         .chars()
@@ -11,7 +11,7 @@ fn map_chars(text: &str, a_map: HashMap<char, char>) -> String {
                 _ => None
             }
         })
-        .collect::<String>()
+        .collect::<Vec<char>>()
 }
 
 /// "Encipher" with the Atbash cipher.
@@ -24,17 +24,7 @@ pub fn encode(plain: &str) -> String {
         .zip(alphabets_reverse.chars())
         .collect();
 
-    plain
-        .to_ascii_lowercase()
-        .chars()
-        .filter_map(|c| {
-            match (c.is_alphabetic(), c.is_numeric()) {
-                (true, false) => { Some(*alphabet_map.get(&c).unwrap()) },
-                (false, true) => { Some(c) },
-                _ => None
-            }
-        })
-        .collect::<Vec<char>>()
+    map_chars(plain, alphabet_map)
         .chunks(5)
         .map(|c| c.iter().collect::<String>())
         .collect::<Vec<String>>()
@@ -52,15 +42,7 @@ pub fn decode(cipher: &str) -> String {
         .zip(alphabets.chars())
         .collect();
 
-    cipher
-        .to_ascii_lowercase()
-        .chars()
-        .filter_map(|c| {
-            match (c.is_alphabetic(), c.is_numeric()) {
-                (true, false) => { Some(*alphabet_map.get(&c).unwrap()) },
-                (false, true) => { Some(c) },
-                _ => None
-            }
-        })
+    map_chars(cipher, alphabet_map)
+        .iter()
         .collect::<String>()
 }
