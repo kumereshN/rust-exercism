@@ -1,10 +1,13 @@
 fn calculate_rows_cols(input_len: usize) -> (usize, usize) {
-    let (mut r, mut c) = (0_usize, 1_usize);
+    let (mut r, mut c) = (1_usize, 1_usize);
     while r * c <= input_len {
+        if r * c == input_len {
+            return (r, c)
+        }
         r += 1_usize;
         c += 1_usize;
     }
-    (r, c)
+    (r-1, c)
 }
 
 pub fn encrypt(input: &str) -> String {
@@ -28,10 +31,8 @@ pub fn encrypt(input: &str) -> String {
                 let padding_length = c - chunks_iter.remainder().len();
                 let chunks_remainder = chunks_iter.remainder().iter().collect::<String>();
                 let padded_string = format!("{:<width$}", chunks_remainder, width = chunks_iter.remainder().len() + padding_length);
-                let padding_vec_string = padded_string.chars().collect::<Vec<char>>();
-                vec_of_slice_chars.push(padding_vec_string)
-            } else {
-                vec_of_slice_chars.push(chunks_iter.remainder().to_vec())
+                let padding_vec_char = padded_string.chars().collect::<Vec<char>>();
+                vec_of_slice_chars.push(padding_vec_char)
         }
 
 
@@ -39,13 +40,19 @@ pub fn encrypt(input: &str) -> String {
             vec_of_slice_chars.insert(0,s.to_vec())
         }
 
-        let mut res = String::new();
+        let mut res = vec![];
 
         for col in 0..c {
             for row in 0..r {
                 res.push(vec_of_slice_chars[row][col])
             }
         }
-        panic!("Something here")
+
+        res
+            .chunks(r)
+            .map(|s| s.iter().collect::<String>())
+            .collect::<Vec<String>>()
+            .join(" ")
+            .to_string()
     }
 }
