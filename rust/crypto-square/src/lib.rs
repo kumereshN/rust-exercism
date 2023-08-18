@@ -14,7 +14,7 @@ pub fn encrypt(input: &str) -> String {
         (0..width)
             .map(|i| {
                 normalized_chars.chunks(width)
-                    .filter_map(|v| v.get(i).or(Some(&' ')))
+                    .map(|v| v.get(i).unwrap_or(&' '))
                     .collect::<String>()
             })
             .collect::<Vec<_>>()
