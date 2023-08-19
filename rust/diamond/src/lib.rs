@@ -9,8 +9,8 @@ pub fn get_diamond(c: char) -> Vec<String> {
 
         let empty_space = "".to_string();
         let mut odd_no_range = (1..).step_by(2);
-        let max_trailing_space = odd_no_range.nth(alphabets_len-2).unwrap();
-        let range_of_internal_whitespace=  (1..=max_trailing_space).rev().step_by(2).collect::<Vec<usize>>();
+        let max_internal_white_space = odd_no_range.nth(alphabets_len-2).unwrap();
+        let range_of_internal_whitespace=  (1..=max_internal_white_space).rev().step_by(2).collect::<Vec<usize>>();
 
         let first_half = reverse_alphabets
             .iter()
@@ -18,13 +18,12 @@ pub fn get_diamond(c: char) -> Vec<String> {
             .map(|(i,&c)| {
                 match i + 1 == alphabets_len {
                     true => {
-                        format!("{:^width$}", c, width = 2 + max_trailing_space)
+                        format!("{:^width$}", c, width = 2 + max_internal_white_space)
                     },
                     false => {
-                        format!("{empty_space:>left_width$}{c:<width_1$}{c}{empty_space:<right_width$}",
-                                left_width = i,
-                                right_width = i,
-                                width_1 = range_of_internal_whitespace.get(i).unwrap() + 1
+                        format!("{empty_space:>external_width$}{c:<internal_width$}{c}{empty_space:<external_width$}",
+                                external_width = i,
+                                internal_width = range_of_internal_whitespace.get(i).unwrap() + 1
                         )
                     }
                 }
