@@ -4,8 +4,8 @@ pub fn get_diamond(c: char) -> Vec<String> {
     }
     else {
         let alphabets = ('A'..=c).collect::<Vec<char>>();
-        let reverse_alphabets = alphabets.iter().rev().copied().collect::<Vec<char>>();
-        let alphabets_len = alphabets.len();
+        let reverse_alphabets = alphabets.into_iter().rev().collect::<Vec<char>>();
+        let alphabets_len = reverse_alphabets.len();
 
         let empty_space = "".to_string();
         let mut odd_no_range = (1..).step_by(2);
@@ -18,7 +18,7 @@ pub fn get_diamond(c: char) -> Vec<String> {
             .map(|(i,&c)| {
                 match i + 1 == alphabets_len {
                     true => {
-                        format!("{:^width$}", c, width = 2 + max_internal_white_space)
+                        format!("{c:^width$}", width = 2 + max_internal_white_space)
                     },
                     false => {
                         format!("{empty_space:>external_width$}{c:<internal_width$}{c}{empty_space:<external_width$}",
@@ -38,5 +38,4 @@ pub fn get_diamond(c: char) -> Vec<String> {
             .chain(second_half)
             .collect::<Vec<String>>()
     }
-
 }
