@@ -8,7 +8,7 @@ pub fn get_diamond(c: char) -> Vec<String> {
         let alphabets_len = reverse_alphabets.len();
 
         let empty_space = "".to_string();
-        let mut max_internal_white_space = (1..).step_by(2).nth(alphabets_len-2).unwrap();
+        let max_internal_white_space = (1..).step_by(2).nth(alphabets_len-2).unwrap();
         let range_of_internal_whitespace=  (1..=max_internal_white_space).rev().step_by(2).collect::<Vec<usize>>();
 
         let first_half = reverse_alphabets
