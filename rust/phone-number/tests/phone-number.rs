@@ -40,31 +40,26 @@ fn test_valid_when_11_digits_and_starting_with_1_even_with_punctuation() {
 }
 
 #[test]
-#[ignore]
 fn test_invalid_when_more_than_11_digits() {
     process_clean_case("321234567890", None);
 }
 
 #[test]
-#[ignore]
 fn test_invalid_with_letters() {
     process_clean_case("123-abc-7890", None);
 }
 
 #[test]
-#[ignore]
 fn test_invalid_with_punctuations() {
     process_clean_case("123-@:!-7890", None);
 }
 
 #[test]
-#[ignore]
 fn test_invalid_if_area_code_starts_with_1_on_valid_11digit_number() {
     process_clean_case("1 (123) 456-7890", None);
 }
 
 #[test]
-#[ignore]
 fn test_invalid_if_area_code_starts_with_0_on_valid_11digit_number() {
     process_clean_case("1 (023) 456-7890", None);
 }
