@@ -1,7 +1,14 @@
+use std::iter::Peekable;
+use std::str::Chars;
 
-fn is_valid_area_code(first_char_area_code: &char) -> bool {
-    let first_char_area_code = first_char_area_code.to_digit(10);
+fn is_valid_area_code(phone_no: &mut Peekable<Chars>) -> bool {
+    let first_char_area_code = phone_no.peek().unwrap().to_digit(10);
     matches!(first_char_area_code, Some((2..=9)))
+}
+
+fn is_valid_exchange_code(phone_no: &mut Peekable<Chars>) -> bool {
+    let first_char_exchange_code = phone_no.nth(3).unwrap().to_digit(10);
+    matches!(first_char_exchange_code, Some((2..=9)))
 }
 
 pub fn number(user_number: &str) -> Option<String> {
@@ -25,19 +32,23 @@ pub fn number(user_number: &str) -> Option<String> {
 
     match (clean_user_number.len(), is_all_numeric_digits) {
         (10, true) => {
-          Some(clean_user_number)
+            let mut clean_user_number_peekable = clean_user_number.chars().peekable();
+            match (is_valid_area_code(&mut clean_user_number_peekable), is_valid_exchange_code(&mut clean_user_number_peekable)) {
+                (true, true) => Some(clean_user_number),
+                (_,_) => None
+            }
         },
         (11, true) => {
             let mut clean_user_number_iter = clean_user_number.chars();
             let country_code = clean_user_number_iter.next().unwrap();
-            let mut remaining_user_number_peekable = clean_user_number_iter.peekable();
+            let mut remaining_user_number_peekable = clean_user_number_iter.clone().peekable();
             match country_code {
                 '1' => {
-                    match is_valid_area_code(remaining_user_number_peekable.peek().unwrap()) {
-                        true => {
-                            Some(remaining_user_number_peekable.collect::<String>())
+                    match (is_valid_area_code(&mut remaining_user_number_peekable), is_valid_exchange_code(&mut remaining_user_number_peekable)) {
+                        (true, true) => {
+                            Some(clean_user_number_iter.collect::<String>())
                         },
-                        false => None
+                        (_,_) => None
                     }
                 },
                 _ => None
