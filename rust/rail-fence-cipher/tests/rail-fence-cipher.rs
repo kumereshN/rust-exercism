@@ -51,7 +51,6 @@ fn test_encode_with_ending_in_the_middle() {
 // decode
 
 #[test]
-#[ignore]
 /// decode with three rails
 fn test_decode_with_three_rails() {
     process_decode_case("TEITELHDVLSNHDTISEIIEA", 3, "THEDEVILISINTHEDETAILS");
@@ -76,7 +75,6 @@ fn test_decode_with_six_rails() {
 }
 
 #[test]
-#[ignore]
 /// encode wide characters
 ///
 /// normally unicode is not part of exercism exercises, but in an exercise
