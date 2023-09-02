@@ -19,7 +19,7 @@ impl RailFence {
             .collect::<Vec<Vec<char>>>();
 
         let first_half_iter = 0..=rails-1;
-        let second_half_iter = first_half_iter.clone().rev().map(|c| c.saturating_sub(1)).take((rails.saturating_sub(2)) as usize);
+        let second_half_iter = (0..=rails-1).rev().map(|c| c.saturating_sub(1)).take((rails.saturating_sub(2)) as usize);
         let mut combined_iter = first_half_iter.chain(second_half_iter).cycle();
 
         for (col_idx, c) in text.chars().enumerate() {
@@ -43,7 +43,7 @@ impl RailFence {
             .collect::<Vec<Vec<char>>>();
 
         let first_half_iter = 0..=rails-1;
-        let second_half_iter = first_half_iter.clone().rev().map(|c| c.saturating_sub(1)).take((rails.saturating_sub(2)) as usize);
+        let second_half_iter = (0..=rails-1).rev().map(|c| c.saturating_sub(1)).take((rails.saturating_sub(2)) as usize);
         let mut combined_iter = first_half_iter.chain(second_half_iter).cycle();
 
         for col_idx in 0..cipher.len() {
@@ -73,8 +73,12 @@ impl RailFence {
         let mut res = String::new();
 
         for col_idx in 0..cipher.len() {
-            let row_idx = combined_iter.clone().skip(2).next().unwrap() as usize;
-            res.push(ziz_zag_vec[row_idx][col_idx]);
+            for row_idx in 0..rails {
+                let ch = ziz_zag_vec[row_idx as usize][col_idx];
+                if ch != '.' {
+                    res.push(ch);
+                }
+            }
         }
 
         res

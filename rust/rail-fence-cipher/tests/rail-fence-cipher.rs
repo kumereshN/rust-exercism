@@ -57,14 +57,12 @@ fn test_decode_with_three_rails() {
 }
 
 #[test]
-#[ignore]
 /// decode with five rails
 fn test_decode_with_five_rails() {
     process_decode_case("EIEXMSMESAORIWSCE", 5, "EXERCISMISAWESOME");
 }
 
 #[test]
-#[ignore]
 /// decode with six rails
 fn test_decode_with_six_rails() {
     process_decode_case(
