@@ -6,43 +6,36 @@ fn test_one() {
 }
 
 #[test]
-#[ignore]
 fn test_two() {
     assert_eq!("II", Roman::from(2).to_string());
 }
 
 #[test]
-#[ignore]
 fn test_three() {
     assert_eq!("III", Roman::from(3).to_string());
 }
 
 #[test]
-#[ignore]
 fn test_four() {
     assert_eq!("IV", Roman::from(4).to_string());
 }
 
 #[test]
-#[ignore]
 fn test_five() {
     assert_eq!("V", Roman::from(5).to_string());
 }
 
 #[test]
-#[ignore]
 fn test_six() {
     assert_eq!("VI", Roman::from(6).to_string());
 }
 
 #[test]
-#[ignore]
 fn test_nine() {
     assert_eq!("IX", Roman::from(9).to_string());
 }
 
 #[test]
-#[ignore]
 fn test_twenty_seven() {
     assert_eq!("XXVII", Roman::from(27).to_string());
 }

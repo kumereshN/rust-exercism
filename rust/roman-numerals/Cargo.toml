@@ -2,6 +2,3 @@
 edition = "2021"
 name = "roman-numerals"
 version = "1.0.0"
-
-[dependencies]
-lazy_static = "1.4.0"

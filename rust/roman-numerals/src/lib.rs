@@ -1,40 +1,45 @@
-use std::collections::HashMap;
 use std::fmt::{Display, Formatter, Result};
-use lazy_static::lazy_static;
 
 // Look up on: https://medium.com/@tomas.langkaas/eight-algorithms-for-roman-numerals-b06c83db12dd
 
 #[derive(Debug)]
-pub struct Roman<'a>(Vec<&'a str>);
+pub struct Roman(String);
 
-lazy_static! {
-    static ref ROMAN_NUMERAL_HASHMAP: HashMap<u32, &'static str> = [
-        (1_000, "M"),
-        (900, "CM"),
-        (500, "D"),
-        (400, "CD"),
-        (100, "C"),
-        (90, "XC"),
-        (50, "L"),
-        (40, "XL"),
-        (10, "X"),
-        (9, "IX"),
-        (5, "V"),
-        (4, "IV"),
-        (1, "I"),
-    ].iter().copied().collect();
-}
+const ROMAN_NUMERALS: [(u32, &str); 13] = [
+    (1_000, "M"),
+    (900, "CM"),
+    (500, "D"),
+    (400, "CD"),
+    (100, "C"),
+    (90, "XC"),
+    (50, "L"),
+    (40, "XL"),
+    (10, "X"),
+    (9, "IX"),
+    (5, "V"),
+    (4, "IV"),
+    (1, "I"),
+];
 
-impl<'a> Display for Roman<'a> {
+
+impl Display for Roman {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result {
-        f.write_str(self.0)
+        f.write_str(self.0.as_str())
         // unimplemented!("Return a roman-numeral string representation of the Roman object");
     }
 }
 
-impl<'a> From<u32> for Roman<'a> {
-    fn from(num: u32) -> Self {
-        let res = *ROMAN_NUMERAL_HASHMAP.get(&num).unwrap();
+impl From<u32> for Roman {
+    fn from(mut num: u32) -> Self {
+
+        let mut res = String::new();
+        for (number, roman_number) in ROMAN_NUMERALS {
+            while num >= number {
+                num -= number;
+                res.push_str(roman_number);
+            }
+        }
+
         Self(res)
         // unimplemented!("Construct a Roman object from the '{num}' number");
     }
