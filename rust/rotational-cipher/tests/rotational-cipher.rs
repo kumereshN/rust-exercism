@@ -26,19 +26,16 @@ fn rotate_n_13_with_wrap() {
 }
 
 #[test]
-#[ignore]
 fn rotate_caps() {
     assert_eq!("TRL", cipher::rotate("OMG", 5));
 }
 
 #[test]
-#[ignore]
 fn rotate_spaces() {
     assert_eq!("T R L", cipher::rotate("O M G", 5));
 }
 
 #[test]
-#[ignore]
 fn rotate_numbers() {
     assert_eq!(
         "Xiwxmrk 1 2 3 xiwxmrk",
@@ -47,7 +44,6 @@ fn rotate_numbers() {
 }
 
 #[test]
-#[ignore]
 fn rotate_punctuation() {
     assert_eq!(
         "Gzo\'n zvo, Bmviyhv!",
@@ -56,7 +52,6 @@ fn rotate_punctuation() {
 }
 
 #[test]
-#[ignore]
 fn rotate_all_the_letters() {
     assert_eq!(
         "Gur dhvpx oebja sbk whzcf bire gur ynml qbt.",
@@ -65,13 +60,11 @@ fn rotate_all_the_letters() {
 }
 
 #[test]
-#[ignore]
 fn rotate_m_negative_1() {
     assert_eq!("l", cipher::rotate("m", -1));
 }
 
 #[test]
-#[ignore]
 fn rotate_letters_negative_26() {
     assert_eq!("omg", cipher::rotate("omg", -26));
 }

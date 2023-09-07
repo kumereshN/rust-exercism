@@ -25,7 +25,18 @@ pub fn rotate(input: &str, key: i8) -> String {
     input
         .chars()
         .map(|c| {
-            get_transpose_char(c, key)
+            match (c.is_alphabetic(), c.is_uppercase()) {
+                (true, true) => {
+                    get_transpose_char(c.to_ascii_lowercase(), key).to_ascii_uppercase()
+                },
+                (true, false) => {
+                    get_transpose_char(c, key)
+                }
+                (_, _) => {
+                    c
+                }
+            }
+
         })
         .collect::<String>()
     }
