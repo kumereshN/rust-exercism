@@ -7,27 +7,17 @@ fn get_transpose_char(c: char, key: i8) -> char {
     let char_idx = *alphabets_hmap.get(&c).unwrap() as i8;
     let mut transpose_idx = char_idx + key;
 
-    match transpose_idx {
-        0..=LARGEST_ALPHABET_INDEX => {
-            *alphabets_hmap
-                .iter()
-                .find(|(&_c, &i)| {
-                    i == transpose_idx as usize
-                })
-                .unwrap()
-                .0
-        }
-        _ => {
-            transpose_idx = transpose_idx % LARGEST_ALPHABET_INDEX - 1;
-            *alphabets_hmap
-                .iter()
-                .find(|(&_c, &i)| {
-                    i == transpose_idx as usize
-                })
-                .unwrap()
-                .0
-        }
+    if transpose_idx > LARGEST_ALPHABET_INDEX {
+        transpose_idx = transpose_idx % LARGEST_ALPHABET_INDEX - 1;
     }
+
+    *alphabets_hmap
+        .iter()
+        .find(|(&_c, &i)| {
+            i == transpose_idx as usize
+        })
+        .unwrap()
+        .0
 }
 
 pub fn rotate(input: &str, key: i8) -> String {
