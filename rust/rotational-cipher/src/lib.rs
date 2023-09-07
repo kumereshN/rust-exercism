@@ -7,13 +7,17 @@ fn get_transpose_char(c: char, key: i8) -> char {
     let char_idx = *alphabets_hmap.get(&c).unwrap() as i8;
     let mut transpose_idx = char_idx + key;
 
-    if transpose_idx > LARGEST_ALPHABET_INDEX {
-        transpose_idx = transpose_idx % LARGEST_ALPHABET_INDEX - 1;
-    }
+
 
     *alphabets_hmap
         .iter()
         .find(|(&_c, &i)| {
+            if transpose_idx > LARGEST_ALPHABET_INDEX {
+                transpose_idx = transpose_idx % LARGEST_ALPHABET_INDEX - 1;
+            }
+            if transpose_idx.is_negative() {
+                transpose_idx %= LARGEST_ALPHABET_INDEX + 1;
+            }
             i == transpose_idx as usize
         })
         .unwrap()
