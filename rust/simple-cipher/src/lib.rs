@@ -1,5 +1,14 @@
 use std::char;
+use rand::prelude::*;
+
+fn is_valid_key(key: &str) -> bool {
+    key.chars().all(|c| c.is_ascii_lowercase())
+}
 pub fn encode(key: &str, s: &str) -> Option<String> {
+    if !is_valid_key(key) || key.is_empty() {
+        return None
+    }
+
     Some(key
         .chars().cycle()
         .zip(s
@@ -14,10 +23,13 @@ pub fn encode(key: &str, s: &str) -> Option<String> {
         })
         .collect::<String>()
     )
-    // unimplemented!("Use {key} to encode {s} using shift cipher")
 }
 
 pub fn decode(key: &str, s: &str) -> Option<String> {
+    if !is_valid_key(key) || key.is_empty() {
+        return None
+    }
+
     Some(key
         .chars().cycle()
         .zip(s
@@ -35,7 +47,13 @@ pub fn decode(key: &str, s: &str) -> Option<String> {
 }
 
 pub fn encode_random(s: &str) -> (String, String) {
-    unimplemented!(
-        "Generate random key with only a-z chars and encode {s}. Return tuple (key, encoded s)"
-    )
+    let mut rng = thread_rng();
+    let key = (0..=100)
+        .map(|_| {
+            rng.gen_range(b'a'..=b'z') as char
+        })
+        .collect::<String>();
+
+    let encoded_string = encode(key.as_str(), s).unwrap();
+    (key, encoded_string)
 }
