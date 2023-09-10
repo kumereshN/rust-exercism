@@ -1,7 +1,7 @@
 use std::char;
 pub fn encode(key: &str, s: &str) -> Option<String> {
     Some(key
-        .chars()
+        .chars().cycle()
         .zip(s
             .chars())
         .map(|(c1, c2)| {
