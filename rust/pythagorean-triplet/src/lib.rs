@@ -1,7 +1,7 @@
 use std::collections::HashSet;
 // https://www.geeksforgeeks.org/pythagorean-triplet-given-sum/
 pub fn find(sum: u32) -> HashSet<[u32; 3]> {
-    let mut res: HashSet<[u32; 3]> = HashSet::new();
+    /*let mut res: HashSet<[u32; 3]> = HashSet::new();
     for i in 1..=sum/3 {
         for j in i + 1..=sum/2 {
             let k = sum - i - j;
@@ -10,6 +10,20 @@ pub fn find(sum: u32) -> HashSet<[u32; 3]> {
             }
         }
     }
-    res
-    // todo!("Given the sum {sum}, return all possible Pythagorean triplets, which produce the said sum, or an empty HashSet if there are no such triplets. Note that you are expected to return triplets in [a, b, c] order, where a < b < c");
+    res*/
+
+    (1..=sum/3)
+        .flat_map(|i| {
+            (i+1..=sum/2)
+                .filter_map(|j| {
+                    let k = sum - i - j;
+                    if i.pow(2) + j.pow(2) == k.pow(2) {
+                        Some([i,j,k])
+                    } else {
+                        None
+                    }
+                })
+                .collect::<HashSet<[u32;3]>>()
+        })
+        .collect::<HashSet<[u32;3]>>()
 }
