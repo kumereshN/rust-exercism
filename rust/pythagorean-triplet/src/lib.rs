@@ -1,18 +1,13 @@
-use std::cmp::max;
 use std::collections::HashSet;
-use std::ops::Div;
 // https://www.geeksforgeeks.org/pythagorean-triplet-given-sum/
 pub fn find(sum: u32) -> HashSet<[u32; 3]> {
     let mut res: HashSet<[u32; 3]> = HashSet::new();
-    let min_range = (sum as f32 / 2f32).sqrt().ceil() as u32;
-    let max_range = ((sum as f32).sqrt() + 1f32).floor() as u32;
-
-    for m in min_range..max_range {
-        let a = (sum as i32 - sum.pow(2) as i32) as f32 / (2 * m.pow(2)) as f32;
-        if a.fract() == 0.0 {
-            let b = sum - m.pow(2);
-            let c = sum - a as u32 - b;
-            res.insert([a as u32, b, c]);
+    for i in 1..=sum/3 {
+        for j in i + 1..=sum/2 {
+            let k = sum - i - j;
+            if i * i + j * j == k * k {
+                res.insert([i,j,k]);
+            }
         }
     }
     res

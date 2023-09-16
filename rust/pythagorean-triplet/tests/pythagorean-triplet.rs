@@ -19,31 +19,26 @@ fn triplets_whose_sum_is_12() {
 }
 
 #[test]
-#[ignore]
 fn triplets_whose_sum_is_108() {
     process_tripletswithsum_case(108, &[[27, 36, 45]]);
 }
 
 #[test]
-#[ignore]
 fn triplets_whose_sum_is_1000() {
     process_tripletswithsum_case(1000, &[[200, 375, 425]]);
 }
 
 #[test]
-#[ignore]
 fn no_matching_triplets_for_1001() {
     process_tripletswithsum_case(1001, &[]);
 }
 
 #[test]
-#[ignore]
 fn returns_all_matching_triplets() {
     process_tripletswithsum_case(90, &[[9, 40, 41], [15, 36, 39]]);
 }
 
 #[test]
-#[ignore]
 fn several_matching_triplets() {
     process_tripletswithsum_case(
         840,
@@ -61,7 +56,6 @@ fn several_matching_triplets() {
 }
 
 #[test]
-#[ignore]
 fn triplets_for_large_number() {
     process_tripletswithsum_case(
         30_000,
