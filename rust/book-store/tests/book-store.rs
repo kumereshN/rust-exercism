@@ -41,28 +41,24 @@ fn empty_basket() {
 }
 
 #[test]
-#[ignore]
 /// Two different books
 fn two_different_books() {
     process_total_case((vec![1, 2], vec![vec![1, 2]]), 1_520);
 }
 
 #[test]
-#[ignore]
 /// Three different books
 fn three_different_books() {
     process_total_case((vec![1, 2, 3], vec![vec![1, 2, 3]]), 2_160);
 }
 
 #[test]
-#[ignore]
 /// Four different books
 fn four_different_books() {
     process_total_case((vec![1, 2, 3, 4], vec![vec![1, 2, 3, 4]]), 2_560);
 }
 
 #[test]
-#[ignore]
 /// Five different books
 fn five_different_books() {
     process_total_case((vec![1, 2, 3, 4, 5], vec![vec![1, 2, 3, 4, 5]]), 3_000);
