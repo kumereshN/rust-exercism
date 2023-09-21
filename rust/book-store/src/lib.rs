@@ -3,10 +3,10 @@ use std::collections::HashSet;
 const BOOK_PRICE: u32 = 800;
 
 enum BookDiscount {
-    Two = 95,
-    Three = 90,
-    Four = 80,
-    Five = 75
+    Two,
+    Three,
+    Four,
+    Five
 }
 
 impl BookDiscount {
