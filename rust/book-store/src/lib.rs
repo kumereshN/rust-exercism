@@ -11,11 +11,14 @@ enum BookDiscount {
     DiscountOfFive = 75
 }
 
-impl Div for BookDiscount {
-    type Output = f32;
-
-    fn div(self, rhs: BookDiscount) -> Self::Output {
-        (self / rhs) as f32
+impl BookDiscount {
+    pub fn get_discount(self) -> f32 {
+        match self {
+            BookDiscount::DiscountOfTwo => 0.95,
+            BookDiscount::DiscountOfThree => 0.90,
+            BookDiscount::DiscountOfFour => 0.80,
+            BookDiscount::DiscountOfFive => 0.75
+        }
     }
 }
 
@@ -30,11 +33,16 @@ pub fn lowest_price(books: &[u32]) -> u32 {
             let total_price_of_books = (total_books_in_basket as u32 * BOOK_PRICE) as f32;
             if books_basket_hashset.len() == total_books_in_basket {
                 match total_books_in_basket {
-                    2 => ((BookDiscount::DiscountOfTwo.div(100)) * (total_price_of_books)) as u32
+                    2 => (BookDiscount::DiscountOfTwo.get_discount() * (total_price_of_books)) as u32,
+                    3 => (BookDiscount::DiscountOfThree.get_discount() * (total_price_of_books)) as u32,
+                    4 => (BookDiscount::DiscountOfFour.get_discount() * (total_price_of_books)) as u32,
+                    5 => (BookDiscount::DiscountOfFive.get_discount() * (total_price_of_books)) as u32,
+                    _ => panic!("Something went wrong")
+
                 }
 
             } else {
-                0
+                BOOK_PRICE * total_books_in_basket as u32
             }
 
         }
