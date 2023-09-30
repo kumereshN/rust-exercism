@@ -54,13 +54,15 @@ pub fn lowest_price(books: &[u32]) -> u32 {
                             .or_insert(1);
                         acc
                     });
-                let mut group_by_total_count_of_books: HashMap<u32, Vec<u32>> = HashMap::new();
-                for (book, count) in total_count_of_books.iter() {
-                    group_by_total_count_of_books
-                        .entry(*count)
-                        .and_modify(|v| v.push(*book))
-                        .or_insert(vec![*book]);
-                }
+                let group_by_total_count_of_books: HashMap<u32, Vec<u32>> = total_count_of_books
+                    .into_iter()
+                    .fold(HashMap::new(), |mut acc, books| {
+                        acc
+                            .entry(books.1)
+                            .and_modify(|v| v.push(books.0))
+                            .or_insert(vec![books.0]);
+                        acc
+                    });
                 10
             }
 
