@@ -65,7 +65,6 @@ fn five_different_books() {
 }
 
 #[test]
-#[ignore]
 /// Two groups of four is cheaper than group of five plus group of three
 fn two_groups_of_four_is_cheaper_than_group_of_five_plus_group_of_three() {
     process_total_case(

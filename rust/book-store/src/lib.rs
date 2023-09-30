@@ -1,4 +1,5 @@
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
+use itertools::Itertools;
 
 const BOOK_PRICE: u32 = 800;
 
@@ -20,27 +21,47 @@ impl BookDiscount {
     }
 }
 
+fn are_books_unique_in_basket(books: &[u32], unique_books: HashSet<&u32>) -> bool {
+    unique_books.len() == books.len()
+}
+
 pub fn lowest_price(books: &[u32]) -> u32 {
     let total_books_in_basket = books.len();
+    let books_basket_hashset = books.iter().collect::<HashSet<&u32>>();
 
     match total_books_in_basket {
         0 => 0,
         1 => BOOK_PRICE,
         _ => {
-            let books_basket_hashset = books.iter().collect::<HashSet<&u32>>();
             let total_price_of_books = (total_books_in_basket as u32 * BOOK_PRICE) as f32;
-            if books_basket_hashset.len() == total_books_in_basket {
+            if are_books_unique_in_basket(books, books_basket_hashset) {
                 match total_books_in_basket {
                     2 => (BookDiscount::Two.get_discount() * (total_price_of_books)) as u32,
                     3 => (BookDiscount::Three.get_discount() * (total_price_of_books)) as u32,
                     4 => (BookDiscount::Four.get_discount() * (total_price_of_books)) as u32,
                     5 => (BookDiscount::Five.get_discount() * (total_price_of_books)) as u32,
-                    _ => panic!("Something went wrong")
+                    _ => panic!("Unique books are greater than 5")
 
                 }
 
             } else {
-                BOOK_PRICE * total_books_in_basket as u32
+                let total_count_of_books = books
+                    .iter()
+                    .fold(HashMap::new(), |mut acc, book| {
+                        acc
+                            .entry(*book)
+                            .and_modify(|counter| *counter += 1u32)
+                            .or_insert(1);
+                        acc
+                    });
+                let mut group_by_total_count_of_books: HashMap<u32, Vec<u32>> = HashMap::new();
+                for (book, count) in total_count_of_books.iter() {
+                    group_by_total_count_of_books
+                        .entry(*count)
+                        .and_modify(|v| v.push(*book))
+                        .or_insert(vec![*book]);
+                }
+                10
             }
 
         }
