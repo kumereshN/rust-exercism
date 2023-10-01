@@ -1,7 +1,7 @@
 use std::collections::HashSet;
 // https://www.geeksforgeeks.org/pythagorean-triplet-given-sum/
 pub fn find(sum: u32) -> HashSet<[u32; 3]> {
-    /*let mut res: HashSet<[u32; 3]> = HashSet::new();
+    let mut res: HashSet<[u32; 3]> = HashSet::new();
     for i in 1..=sum/3 {
         for j in i + 1..=sum/2 {
             let k = sum - i - j;
@@ -10,9 +10,9 @@ pub fn find(sum: u32) -> HashSet<[u32; 3]> {
             }
         }
     }
-    res*/
+    res
 
-    (1..=sum/3)
+/*    (1..=sum/3)
         .flat_map(|i| {
             (i+1..=sum/2)
                 .filter_map(|j| {
@@ -25,5 +25,5 @@ pub fn find(sum: u32) -> HashSet<[u32; 3]> {
                 })
                 .collect::<HashSet<[u32;3]>>()
         })
-        .collect::<HashSet<[u32;3]>>()
+        .collect::<HashSet<[u32;3]>>()*/
 }

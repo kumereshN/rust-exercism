@@ -1,6 +1,10 @@
 use std::collections::{HashMap, HashSet};
 use itertools::Itertools;
 
+// First iteration: Total sum of books * min no of copies
+// (you're adding copies not multiplying the sum of books), largest copy's value
+// Second iteration: largest copy / min no of copy's value + largest copy's value * largest copy (Same here, you making copies)
+
 const BOOK_PRICE: u32 = 800;
 
 enum BookDiscount {
@@ -21,7 +25,7 @@ impl BookDiscount {
     }
 }
 
-fn are_books_unique_in_basket(books: &[u32], unique_books: HashSet<&u32>) -> bool {
+fn are_books_unique_in_basket(books: &[u32], unique_books: &HashSet<&u32>) -> bool {
     unique_books.len() == books.len()
 }
 
@@ -34,7 +38,7 @@ pub fn lowest_price(books: &[u32]) -> u32 {
         1 => BOOK_PRICE,
         _ => {
             let total_price_of_books = (total_books_in_basket as u32 * BOOK_PRICE) as f32;
-            if are_books_unique_in_basket(books, books_basket_hashset) {
+            if are_books_unique_in_basket(books, &books_basket_hashset) {
                 match total_books_in_basket {
                     2 => (BookDiscount::Two.get_discount() * (total_price_of_books)) as u32,
                     3 => (BookDiscount::Three.get_discount() * (total_price_of_books)) as u32,
@@ -54,15 +58,28 @@ pub fn lowest_price(books: &[u32]) -> u32 {
                             .or_insert(1);
                         acc
                     });
-                let group_by_total_count_of_books: HashMap<u32, Vec<u32>> = total_count_of_books
+                let group_by_total_count_of_books: HashMap<u32, u32> = total_count_of_books
                     .into_iter()
                     .fold(HashMap::new(), |mut acc, books| {
                         acc
                             .entry(books.1)
-                            .and_modify(|v| v.push(books.0))
-                            .or_insert(vec![books.0]);
+                            .and_modify(|c| *c += 1u32)
+                            .or_insert(1);
                         acc
                     });
+                let mut res: Vec<Vec<u32>> = vec![];
+                let total_number_of_books = books_basket_hashset.len() as u32;
+                let min_no_copy = *group_by_total_count_of_books.iter().min_by_key(|n| n.0).unwrap().0;
+                let min_no_copy_value = *group_by_total_count_of_books.iter().min_by_key(|n| n.0).unwrap().1;
+                let largest_copy = *group_by_total_count_of_books.iter().max_by_key(|n| n.0).unwrap().0;
+                let largest_copy_value = *group_by_total_count_of_books.iter().max_by_key(|n| n.0).unwrap().1;
+
+                let mut first_iter = vec![total_number_of_books; min_no_copy as usize];
+                first_iter.push(largest_copy_value);
+                res.push(first_iter);
+
+                let second_iter = vec![(largest_copy_value / min_no_copy_value) + largest_copy_value; largest_copy as usize];
+                res.push(second_iter);
                 10
             }
 
