@@ -80,6 +80,8 @@ pub fn lowest_price(books: &[u32]) -> u32 {
 
                 let second_iter = vec![(largest_copy_value / min_no_copy_value) + largest_copy_value; largest_copy as usize];
                 res.push(second_iter);
+                // If group by group_by_total_count_of_books is only 1, then divide the group evenly
+                // If not follow up with first_iter and second_iter
                 10
             }
 
