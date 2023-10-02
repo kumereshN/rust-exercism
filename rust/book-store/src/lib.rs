@@ -1,5 +1,4 @@
 use std::collections::{HashMap, HashSet};
-use itertools::Itertools;
 
 // First iteration: Total sum of books * min no of copies
 // (you're adding copies not multiplying the sum of books), largest copy's value
@@ -25,10 +24,6 @@ impl BookDiscount {
     }
 }
 
-fn are_books_unique_in_basket(books: &[u32], unique_books: &HashSet<&u32>) -> bool {
-    unique_books.len() == books.len()
-}
-
 pub fn lowest_price(books: &[u32]) -> u32 {
     let total_books_in_basket = books.len();
     let books_basket_hashset = books.iter().collect::<HashSet<&u32>>();
@@ -37,18 +32,7 @@ pub fn lowest_price(books: &[u32]) -> u32 {
         0 => 0,
         1 => BOOK_PRICE,
         _ => {
-            let total_price_of_books = (total_books_in_basket as u32 * BOOK_PRICE) as f32;
-            if are_books_unique_in_basket(books, &books_basket_hashset) {
-                match total_books_in_basket {
-                    2 => (BookDiscount::Two.get_discount() * (total_price_of_books)) as u32,
-                    3 => (BookDiscount::Three.get_discount() * (total_price_of_books)) as u32,
-                    4 => (BookDiscount::Four.get_discount() * (total_price_of_books)) as u32,
-                    5 => (BookDiscount::Five.get_discount() * (total_price_of_books)) as u32,
-                    _ => panic!("Unique books are greater than 5")
-
-                }
-
-            } else {
+                let total_price_of_books = (total_books_in_basket as u32 * BOOK_PRICE) as f32;
                 let total_count_of_books = books
                     .iter()
                     .fold(HashMap::new(), |mut acc, book| {
@@ -71,21 +55,36 @@ pub fn lowest_price(books: &[u32]) -> u32 {
                 let total_number_of_books = books_basket_hashset.len() as u32;
                 let min_no_copy = *group_by_total_count_of_books.iter().min_by_key(|n| n.0).unwrap().0;
                 let min_no_copy_value = *group_by_total_count_of_books.iter().min_by_key(|n| n.0).unwrap().1;
-                let largest_copy = *group_by_total_count_of_books.iter().max_by_key(|n| n.0).unwrap().0;
-                let largest_copy_value = *group_by_total_count_of_books.iter().max_by_key(|n| n.0).unwrap().1;
+                let max_copy = *group_by_total_count_of_books.iter().max_by_key(|n| n.0).unwrap().0;
+                let max_copy_value = *group_by_total_count_of_books.iter().max_by_key(|n| n.0).unwrap().1;
 
-                let mut first_iter = vec![total_number_of_books; min_no_copy as usize];
-                first_iter.push(largest_copy_value);
-                res.push(first_iter);
+                let group_by_total_count_of_books_len = group_by_total_count_of_books.len();
 
-                let second_iter = vec![(largest_copy_value / min_no_copy_value) + largest_copy_value; largest_copy as usize];
-                res.push(second_iter);
+                match group_by_total_count_of_books_len {
+                    1 => {
+                        match min_no_copy_value {
+                            1 => return total_price_of_books as u32,
+                            2 => return (BookDiscount::Two.get_discount() * (total_price_of_books)) as u32,
+                            3 => return (BookDiscount::Three.get_discount() * (total_price_of_books)) as u32,
+                            4 => return (BookDiscount::Four.get_discount() * (total_price_of_books)) as u32,
+                            5 => return (BookDiscount::Five.get_discount() * (total_price_of_books)) as u32,
+                            _ => panic!("Something went wrong")
+                        };
+                    },
+                    2 => {
+                        let mut first_iter = vec![total_number_of_books; min_no_copy as usize];
+                        first_iter.push(max_copy_value);
+                        res.push(first_iter);
+
+                        let second_iter = vec![(max_copy_value / min_no_copy_value) + max_copy_value; max_copy as usize];
+                        res.push(second_iter);
+                    },
+                    _ => panic!("Something went wrong")
+                }
                 // If group by group_by_total_count_of_books is only 1, then divide the group evenly
                 // If not follow up with first_iter and second_iter
                 10
             }
-
         }
     }
     // todo!("Find the lowest price of the bookbasket with books {books:?}")
-}
