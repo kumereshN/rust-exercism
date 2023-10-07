@@ -1,114 +1,29 @@
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 
-// First iteration: Total sum of books * min no of copies
-// (you're adding copies not multiplying the sum of books), largest copy's value
-// Second iteration: largest copy / min no of copy's value + largest copy's value * largest copy (Same here, you making copies)
-
-const BOOK_PRICE: u32 = 800;
-
-enum BookDiscount {
-    Two,
-    Three,
-    Four,
-    Five
-}
-
-impl BookDiscount {
-    pub fn get_discount(self) -> f32 {
-        match self {
-            BookDiscount::Two => 0.95,
-            BookDiscount::Three => 0.90,
-            BookDiscount::Four => 0.80,
-            BookDiscount::Five => 0.75
-        }
-    }
-}
-
-fn total_cost_of_books_in_group(group: &Vec<u32>) -> u32 {
-    group
-        .iter()
-        .filter_map(|&total_books|{
-            let total_price_of_books = (total_books * BOOK_PRICE) as f32;
-            match total_books {
-                1 => Some(total_price_of_books as u32),
-                2 => Some((BookDiscount::Two.get_discount() * (total_price_of_books)) as u32),
-                3 => Some((BookDiscount::Three.get_discount() * (total_price_of_books)) as u32),
-                4 => Some((BookDiscount::Four.get_discount() * (total_price_of_books)) as u32),
-                5 => Some((BookDiscount::Five.get_discount() * (total_price_of_books)) as u32),
-                _ => None
-            }
-        })
-        .sum()
-}
+const PRICES: &[u32] = &[800, 1520, 2160, 2560, 3000];
 
 pub fn lowest_price(books: &[u32]) -> u32 {
-    let total_books_in_basket = books.len();
-    let books_basket_hashset = books.iter().collect::<HashSet<&u32>>();
-    let total_price_of_books = (total_books_in_basket as u32 * BOOK_PRICE) as f32;
-
-    match total_books_in_basket {
-        0 => 0,
-        1 => BOOK_PRICE,
-        _ => {
-                let total_count_of_books = books
-                    .iter()
-                    .fold(HashMap::new(), |mut acc, book| {
-                        acc
-                            .entry(*book)
-                            .and_modify(|counter| *counter += 1u32)
-                            .or_insert(1);
-                        acc
-                    });
-                let group_by_total_count_of_books: HashMap<u32, u32> = total_count_of_books
-                    .into_iter()
-                    .fold(HashMap::new(), |mut acc, books| {
-                        acc
-                            .entry(books.1)
-                            .and_modify(|c| *c += 1u32)
-                            .or_insert(1);
-                        acc
-                    });
-                let mut res: Vec<Vec<u32>> = vec![];
-                let total_number_of_unique_books = books_basket_hashset.len() as u32;
-                let min_no_copy = *group_by_total_count_of_books.iter().min_by_key(|n| n.0).unwrap().0;
-                let min_no_copy_value = *group_by_total_count_of_books.iter().min_by_key(|n| n.0).unwrap().1;
-                let max_copy = *group_by_total_count_of_books.iter().max_by_key(|n| n.0).unwrap().0;
-                let max_copy_value = *group_by_total_count_of_books.iter().max_by_key(|n| n.0).unwrap().1;
-
-                let group_by_total_count_of_books_len = group_by_total_count_of_books.len();
-
-                match group_by_total_count_of_books_len {
-                    1 => {
-                        match min_no_copy_value {
-                            1 => total_price_of_books as u32,
-                            2 => (BookDiscount::Two.get_discount() * (total_price_of_books)) as u32,
-                            3 => (BookDiscount::Three.get_discount() * (total_price_of_books)) as u32,
-                            4 => (BookDiscount::Four.get_discount() * (total_price_of_books)) as u32,
-                            5 => (BookDiscount::Five.get_discount() * (total_price_of_books)) as u32,
-                            _ => panic!("Something went wrong")
-                        }
-                    },
-                    2..=100 => {
-                        let mut first_iter = vec![total_number_of_unique_books; min_no_copy as usize];
-                        first_iter.push(max_copy_value);
-                        res.push(first_iter);
-
-                        let second_iter = vec![(max_copy_value / min_no_copy_value) + max_copy_value; max_copy as usize];
-                        res.push(second_iter);
-
-                        res
-                            .iter()
-                            .filter(|&v| v.iter().sum::<u32>() == total_books_in_basket as u32)
-                            .map(total_cost_of_books_in_group)
-                            .filter(|&n| n > 0)
-                            .min()
-                            .unwrap()
-                    },
-                    _ => panic!("Something went wrong")
-                }
-                // If group by group_by_total_count_of_books is only 1, then divide the group evenly
-                // If not follow up with first_iter and second_iter
-            }
-        }
+    if books.is_empty() {
+        return 0;
     }
-    // todo!("Find the lowest price of the bookbasket with books {books:?}")
+
+    let mut piles: Vec<u32> = books.iter().fold(HashMap::<u32, u32>::new(), |mut h, i| {
+        *h.entry(*i).or_insert(0) += 1;
+        h
+    }).values().cloned().collect();
+
+    piles.sort_by(|a, b| b.cmp(a));
+    for i in 0..(piles.len() - 1) {
+        piles[i] -= piles[i + 1];
+    }
+    if piles.len() >= 5 {
+        // Get the minimum pile of book between 3rd most common and 5th most common book
+        let n = piles[2].min(piles[4]);
+        // Remove the minimum pile from both 3rd most common and 5th most common book
+        piles[2] -= n;
+        piles[4] -= n;
+        // Add the removed piles to the 4th most common pile to form as many sets of 5 books as possible
+        piles[3] += 2 * n;
+    }
+    piles.iter().zip(PRICES.iter()).fold(0, |sum, (n, p)| sum + n * p)
+}
