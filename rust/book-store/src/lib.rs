@@ -88,7 +88,7 @@ pub fn lowest_price(books: &[u32]) -> u32 {
                             _ => panic!("Something went wrong")
                         }
                     },
-                    2 => {
+                    2..=100 => {
                         let mut first_iter = vec![total_number_of_unique_books; min_no_copy as usize];
                         first_iter.push(max_copy_value);
                         res.push(first_iter);
