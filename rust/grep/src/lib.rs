@@ -30,40 +30,24 @@ impl Flags {
 pub fn grep(pattern: &str, flags: &Flags, files: &[&str]) -> Result<Vec<String>, Error> {
     let res: Vec<String> = vec![];
 
-
-
     match files.len() {
         1 => {
-            if let Some(file) = files.iter().next() {
-                return if file.contains("result") {
-                    Ok(res)
-                } else if file.contains("error") {
-                    Err(anyhow!("File name contains error"))
-                } else {
-                    let file_content = fs::read_to_string(file)?;
-                    if file_content.contains(pattern) {
-                        Ok(file_content
-                            .lines()
-                            .enumerate()
-                            .filter_map(|(i, c)| {
-                                if c.contains(pattern) {
-                                    Some(c.to_string())
-                                } else {
-                                    None
-                                }
-                            })
-                            .collect::<Vec<String>>()
-                        )
+            let file_name = files[0];
+            let file_content = fs::read_to_string(file_name)?;
+            Ok(file_content
+                .lines()
+                .filter_map(|c| {
+                    if c.contains(pattern) {
+                        Some(c.to_string())
                     } else {
-                        Err(anyhow!("Issue"))
+                        None
                     }
-                }
-            }
+                })
+                .collect::<Vec<String>>()
+            )
         },
         _ => panic!("Something went wrong")
     }
-
-    Ok(res)
 /*    todo!(
         "Search the files '{files:?}' for '{pattern}' pattern and save the matches in a vector. Your search logic should be aware of the given flags '{flags:?}'"
     );*/
