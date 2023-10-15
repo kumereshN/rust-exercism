@@ -210,7 +210,6 @@ set_up_test_case!(
 
 set_up_test_case!(
     #[test]
-    #[ignore]
     one_file_one_match_caseinsensitive_flag(
         pattern = "FORBIDDEN",
         flags = ["-i"],
@@ -221,7 +220,6 @@ set_up_test_case!(
 
 set_up_test_case!(
     #[test]
-    #[ignore]
     one_file_one_match_print_file_names_flag(
         pattern = "Forbidden",
         flags = ["-l"],
@@ -232,7 +230,6 @@ set_up_test_case!(
 
 set_up_test_case!(
     #[test]
-    #[ignore]
     one_file_one_match_match_entire_lines_flag(
         pattern = "With loss of Eden, till one greater Man",
         flags = ["-x"],
@@ -243,7 +240,6 @@ set_up_test_case!(
 
 set_up_test_case!(
     #[test]
-    #[ignore]
     one_file_one_match_multiple_flags(
         pattern = "OF ATREUS, Agamemnon, KIng of MEN.",
         flags = ["-x", "-i", "-n"],

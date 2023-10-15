@@ -32,31 +32,10 @@ pub fn grep(pattern: &str, flags: &Flags, files: &[&str]) -> Result<Vec<String>,
 
     for file in files {
         let file_content = fs::read_to_string(file)?;
-        if let Some(&flag) = flags.0.first() {
-            match flag {
-                "-n" => {
-                    res.push(file_content
-                        .lines()
-                        .enumerate()
-                        .filter_map(|(i, c)| {
-                            if c.contains(pattern) {
-                                Some(format!("{}:{}",i+1, c))
-                            } else {
-                                None
-                            }
-                        })
-                        .collect::<Vec<String>>()
-                        .join("\n"));
-                },
-                "-l" => {},
-                "-i" => {},
-                "-v" => {},
-                "-x" => {},
-                _ => {
+        let flag_vec = &flags.0;
+        let mut flags_iter = flags.0.iter();
 
-                }
-            }
-        } else {
+        if flag_vec.is_empty() {
             res.push(file_content
                 .lines()
                 .filter_map(|c| {
@@ -68,6 +47,64 @@ pub fn grep(pattern: &str, flags: &Flags, files: &[&str]) -> Result<Vec<String>,
                 })
                 .collect::<Vec<String>>()
                 .join("\n"));
+        }
+
+        for &flag in flag_vec {
+            match flag {
+                "-n" => {
+                    res.push(file_content
+                        .lines()
+                        .enumerate()
+                        .filter_map(|(i, c)| {
+                            if c.contains(pattern) {
+                                Some(format!("{}:{}", i+1, c))
+                            } else {
+                                None
+                            }
+                        })
+                        .collect::<Vec<String>>()
+                        .join("\n"));
+                },
+                "-l" => {
+                    if file_content.contains(pattern) {
+                        res.push(file.parse()?)
+                    }
+                },
+                "-i" => {
+                    res.push(
+                        file_content
+                            .lines()
+                            .filter_map(|c| {
+                                if c.to_ascii_lowercase().contains(&pattern.to_ascii_lowercase()) {
+                                    Some(c.to_string())
+                                } else {
+                                    None
+                                }
+                            })
+                            .collect::<Vec<String>>()
+                            .join("\n")
+                    )
+                },
+                "-v" => {},
+                "-x" => {
+                    res.push(
+                    file_content
+                        .lines()
+                        .filter_map(|c| {
+                            if c == pattern {
+                                Some(c.to_string())
+                            } else {
+                                None
+                            }
+                        })
+                        .collect::<Vec<String>>()
+                        .join("\n")
+                    )
+                },
+                _ => {
+                    panic!("Something went wrong")
+                }
+            }
         }
     }
 
