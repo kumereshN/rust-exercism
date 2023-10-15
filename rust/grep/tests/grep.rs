@@ -200,7 +200,6 @@ set_up_test_case!(
 
 set_up_test_case!(
     #[test]
-    #[ignore]
     one_file_one_match_print_line_numbers_flag(
         pattern = "Forbidden",
         flags = ["-n"],

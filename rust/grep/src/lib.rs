@@ -14,12 +14,12 @@ use anyhow::{anyhow, Error};
 /// [`std::env::args`]: https://doc.rust-lang.org/std/env/fn.args.html
 /// [`structopt`]: https://crates.io/crates/structopt
 #[derive(Debug)]
-pub struct Flags(Vec<String>);
+pub struct Flags<'a>(Vec<&'a str>);
 
-impl Flags {
-    pub fn new(flags: &[&str]) -> Self {
+impl<'a> Flags<'a> {
+    pub fn new(flags: &[&'a str]) -> Self {
         // Dummy placeholder text
-        Self(vec![])
+        Self(flags.to_vec())
         /*        todo!(
             "Given the flags {flags:?} implement your own 'Flags' struct to handle flags-related logic"
         );*/
@@ -32,18 +32,43 @@ pub fn grep(pattern: &str, flags: &Flags, files: &[&str]) -> Result<Vec<String>,
 
     for file in files {
         let file_content = fs::read_to_string(file)?;
-        res.push(file_content
-            .lines()
-            .filter_map(|c| {
-                if c.contains(pattern) {
-                    Some(c.to_string())
-                } else {
-                    None
+        if let Some(&flag) = flags.0.first() {
+            match flag {
+                "-n" => {
+                    res.push(file_content
+                        .lines()
+                        .enumerate()
+                        .filter_map(|(i, c)| {
+                            if c.contains(pattern) {
+                                Some(format!("{}:{}",i+1, c))
+                            } else {
+                                None
+                            }
+                        })
+                        .collect::<Vec<String>>()
+                        .join("\n"));
+                },
+                "-l" => {},
+                "-i" => {},
+                "-v" => {},
+                "-x" => {},
+                _ => {
+
                 }
-            })
-            .collect::<Vec<String>>()
-            .join("\n")
-        )
+            }
+        } else {
+            res.push(file_content
+                .lines()
+                .filter_map(|c| {
+                    if c.contains(pattern) {
+                        Some(c.to_string())
+                    } else {
+                        None
+                    }
+                })
+                .collect::<Vec<String>>()
+                .join("\n"));
+        }
     }
 
     Ok(res)
