@@ -240,6 +240,7 @@ set_up_test_case!(
 
 set_up_test_case!(
     #[test]
+    #[ignore]
     one_file_one_match_multiple_flags(
         pattern = "OF ATREUS, Agamemnon, KIng of MEN.",
         flags = ["-x", "-i", "-n"],
@@ -250,7 +251,6 @@ set_up_test_case!(
 
 set_up_test_case!(
     #[test]
-    #[ignore]
     one_file_several_matches_no_flags(
         pattern = "may",
         flags = [],

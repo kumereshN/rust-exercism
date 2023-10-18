@@ -28,12 +28,11 @@ impl<'a> Flags<'a> {
 }
 
 pub fn grep(pattern: &str, flags: &Flags, files: &[&str]) -> Result<Vec<String>, Error> {
-    let mut res: Vec<String> = vec![];
+    let mut res: Vec<Vec<String>> = vec![];
 
     for file in files {
         let file_content = fs::read_to_string(file)?;
-        let flag_vec = &flags.0;
-        let mut flags_iter = flags.0.iter();
+        let flag_vec = &flags.0.clone();
 
         if flag_vec.is_empty() {
             res.push(file_content
@@ -46,7 +45,7 @@ pub fn grep(pattern: &str, flags: &Flags, files: &[&str]) -> Result<Vec<String>,
                     }
                 })
                 .collect::<Vec<String>>()
-                .join("\n"));
+            );
         }
 
         for &flag in flag_vec {
@@ -63,11 +62,11 @@ pub fn grep(pattern: &str, flags: &Flags, files: &[&str]) -> Result<Vec<String>,
                             }
                         })
                         .collect::<Vec<String>>()
-                        .join("\n"));
+                    )
                 },
                 "-l" => {
                     if file_content.contains(pattern) {
-                        res.push(file.parse()?)
+                        res.push(vec![file.to_string()])
                     }
                 },
                 "-i" => {
@@ -82,7 +81,6 @@ pub fn grep(pattern: &str, flags: &Flags, files: &[&str]) -> Result<Vec<String>,
                                 }
                             })
                             .collect::<Vec<String>>()
-                            .join("\n")
                     )
                 },
                 "-v" => {},
@@ -98,7 +96,6 @@ pub fn grep(pattern: &str, flags: &Flags, files: &[&str]) -> Result<Vec<String>,
                             }
                         })
                         .collect::<Vec<String>>()
-                        .join("\n")
                     )
                 },
                 _ => {
@@ -108,7 +105,7 @@ pub fn grep(pattern: &str, flags: &Flags, files: &[&str]) -> Result<Vec<String>,
         }
     }
 
-    Ok(res)
+    Ok(res.into_iter().flatten().collect::<Vec<String>>())
 /*    todo!(
         "Search the files '{files:?}' for '{pattern}' pattern and save the matches in a vector. Your search logic should be aware of the given flags '{flags:?}'"
     );*/
