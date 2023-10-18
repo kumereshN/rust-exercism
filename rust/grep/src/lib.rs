@@ -28,6 +28,11 @@ impl<'a> Flags<'a> {
 }
 
 pub fn grep(pattern: &str, flags: &Flags, files: &[&str]) -> Result<Vec<String>, Error> {
+    /*
+    1: Modify file contents(-i)
+    2: Modify output (-n)
+    3: Pattern matching (-l, -v, -x)
+    */
     let mut res: Vec<Vec<String>> = vec![];
 
     for file in files {
