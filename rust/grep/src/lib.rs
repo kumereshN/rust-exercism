@@ -55,13 +55,14 @@ pub fn grep(pattern: &str, flags: &Flags, files: &[&str]) -> Result<Vec<String>,
                 }
 
                 if flags.has("-l") {
-                    results.push(file.parse()?)
+                    results.push(file.parse()?);
+                    break;
                 } else {
-                    match total_files {
-                        1 => result.push_str(line),
-                        2.. => result.push_str(format!("{}:{}", file, line).as_str()),
-                        _ => {panic!("Something went wrong")}
-                    };
+                    if total_files < 2 {
+                        result.push_str(line)
+                    } else {
+                        result.push_str(format!("{}:{}", file, line).as_str())
+                    }
                     results.push(result);
                 }
             }

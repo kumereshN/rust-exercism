@@ -398,7 +398,6 @@ set_up_test_case!(
 
 set_up_test_case!(
     #[test]
-    #[ignore]
     multiple_files_one_match_print_file_names_flag(
         pattern = "who",
         flags = ["-l"],
