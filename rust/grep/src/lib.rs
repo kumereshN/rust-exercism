@@ -38,6 +38,7 @@ pub fn grep(pattern: &str, flags: &Flags, files: &[&str]) -> Result<Vec<String>,
     let flag = if flags.has("-i") { "(?i)" } else { "" };
     let match_entire_line = if flags.has("-x") { "^" } else { "" };
     let pattern = Regex::new(&format!("{}{}{}", flag, match_entire_line, pattern))?;
+    let total_files = files.len();
 
 
     for file in files {
@@ -56,7 +57,11 @@ pub fn grep(pattern: &str, flags: &Flags, files: &[&str]) -> Result<Vec<String>,
                 if flags.has("-l") {
                     results.push(file.parse()?)
                 } else {
-                    result.push_str(line);
+                    match total_files {
+                        1 => result.push_str(line),
+                        2.. => result.push_str(format!("{}:{}", file, line).as_str()),
+                        _ => {panic!("Something went wrong")}
+                    };
                     results.push(result);
                 }
             }

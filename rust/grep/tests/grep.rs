@@ -368,7 +368,6 @@ set_up_test_case!(
 
 set_up_test_case!(
     #[test]
-    #[ignore]
     multiple_files_several_matches_no_flags(
         pattern = "may",
         flags = [],
