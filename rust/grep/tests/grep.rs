@@ -240,7 +240,6 @@ set_up_test_case!(
 
 set_up_test_case!(
     #[test]
-    #[ignore]
     one_file_one_match_multiple_flags(
         pattern = "OF ATREUS, Agamemnon, KIng of MEN.",
         flags = ["-x", "-i", "-n"],
@@ -265,7 +264,6 @@ set_up_test_case!(
 
 set_up_test_case!(
     #[test]
-    #[ignore]
     one_file_several_matches_print_line_numbers_flag(
         pattern = "may",
         flags = ["-n"],
@@ -280,7 +278,6 @@ set_up_test_case!(
 
 set_up_test_case!(
     #[test]
-    #[ignore]
     one_file_several_matches_match_entire_lines_flag(
         pattern = "may",
         flags = ["-x"],
@@ -291,7 +288,6 @@ set_up_test_case!(
 
 set_up_test_case!(
     #[test]
-    #[ignore]
     one_file_several_matches_caseinsensitive_flag(
         pattern = "ACHILLES",
         flags = ["-i"],
@@ -305,7 +301,6 @@ set_up_test_case!(
 
 set_up_test_case!(
     #[test]
-    #[ignore]
     one_file_several_matches_inverted_flag(
         pattern = "Of",
         flags = ["-v"],
@@ -322,7 +317,6 @@ set_up_test_case!(
 
 set_up_test_case!(
     #[test]
-    #[ignore]
     one_file_no_matches_various_flags(
         pattern = "Gandalf",
         flags = ["-n", "-l", "-x", "-i"],
@@ -333,7 +327,6 @@ set_up_test_case!(
 
 set_up_test_case!(
     #[test]
-    #[ignore]
     one_file_several_matches_inverted_and_match_entire_lines_flags(
         pattern = "Illustrious into Ades premature,",
         flags = ["-x", "-v"],
@@ -353,7 +346,6 @@ set_up_test_case!(
 
 set_up_test_case!(
     #[test]
-    #[ignore]
     one_file_one_match_file_flag_takes_precedence_over_line_flag(
         pattern = "ten",
         flags = ["-n", "-l"],
@@ -366,7 +358,6 @@ set_up_test_case!(
 
 set_up_test_case!(
     #[test]
-    #[ignore]
     multiple_files_one_match_no_flags(
         pattern = "Agamemnon",
         flags = [],

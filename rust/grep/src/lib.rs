@@ -1,5 +1,6 @@
 use std::fs;
 use anyhow::{anyhow, Error};
+use regex::Regex;
 
 /// While using `&[&str]` to handle flags is convenient for exercise purposes,
 /// and resembles the output of [`std::env::args`], in real-world projects it is
@@ -20,98 +21,46 @@ impl<'a> Flags<'a> {
     pub fn new(flags: &[&'a str]) -> Self {
         // Dummy placeholder text
         Self(flags.to_vec())
-        /*        todo!(
-            "Given the flags {flags:?} implement your own 'Flags' struct to handle flags-related logic"
-        );*/
+    }
 
+    fn has(&self, flag: &str) -> bool {
+        self.0.contains(&flag)
     }
 }
 
 pub fn grep(pattern: &str, flags: &Flags, files: &[&str]) -> Result<Vec<String>, Error> {
     /*
-    1: Modify file contents(-i)
-    2: Modify output (-n)
-    3: Pattern matching (-l, -v, -x)
-    */
-    let mut res: Vec<Vec<String>> = vec![];
+1: Modify output (-n, -l)
+2: Pattern matching (-i, -v, -x)
+*/
+    let mut results: Vec<String> = vec![];
+
+    let flag = if flags.has("-i") { "(?i)" } else { "" };
+    let match_entire_line = if flags.has("-x") { "^" } else { "" };
+    let pattern = Regex::new(&format!("{}{}{}", flag, match_entire_line, pattern))?;
+
 
     for file in files {
         let file_content = fs::read_to_string(file)?;
-        let flag_vec = &flags.0.clone();
 
-        if flag_vec.is_empty() {
-            res.push(file_content
-                .lines()
-                .filter_map(|c| {
-                    if c.contains(pattern) {
-                        Some(c.to_string())
-                    } else {
-                        None
-                    }
-                })
-                .collect::<Vec<String>>()
-            );
-        }
+        for (num, line) in file_content.lines().enumerate() {
+            let matches = pattern.is_match(line);
 
-        for &flag in flag_vec {
-            match flag {
-                "-n" => {
-                    res.push(file_content
-                        .lines()
-                        .enumerate()
-                        .filter_map(|(i, c)| {
-                            if c.contains(pattern) {
-                                Some(format!("{}:{}", i+1, c))
-                            } else {
-                                None
-                            }
-                        })
-                        .collect::<Vec<String>>()
-                    )
-                },
-                "-l" => {
-                    if file_content.contains(pattern) {
-                        res.push(vec![file.to_string()])
-                    }
-                },
-                "-i" => {
-                    res.push(
-                        file_content
-                            .lines()
-                            .filter_map(|c| {
-                                if c.to_ascii_lowercase().contains(&pattern.to_ascii_lowercase()) {
-                                    Some(c.to_string())
-                                } else {
-                                    None
-                                }
-                            })
-                            .collect::<Vec<String>>()
-                    )
-                },
-                "-v" => {},
-                "-x" => {
-                    res.push(
-                    file_content
-                        .lines()
-                        .filter_map(|c| {
-                            if c == pattern {
-                                Some(c.to_string())
-                            } else {
-                                None
-                            }
-                        })
-                        .collect::<Vec<String>>()
-                    )
-                },
-                _ => {
-                    panic!("Something went wrong")
+            if matches != flags.has("-v") {
+                let mut result = String::new();
+
+                if flags.has("-n") {
+                    result.push_str(&format!("{}:", num + 1));
+                }
+
+                if flags.has("-l") {
+                    results.push(file.parse()?)
+                } else {
+                    result.push_str(line);
+                    results.push(result);
                 }
             }
         }
     }
-
-    Ok(res.into_iter().flatten().collect::<Vec<String>>())
-/*    todo!(
-        "Search the files '{files:?}' for '{pattern}' pattern and save the matches in a vector. Your search logic should be aware of the given flags '{flags:?}'"
-    );*/
+    Ok(results)
 }
