@@ -428,7 +428,6 @@ set_up_test_case!(
 
 set_up_test_case!(
     #[test]
-    #[ignore]
     multiple_files_several_matches_caseinsensitive_flag_utf8(
         pattern = "В", // This letter stands for cyrillic 'Ve' and not latin 'B'. Therefore there should be no matches from paradise_lost.txt
         flags = ["-i"],
@@ -444,7 +443,6 @@ set_up_test_case!(
 
 set_up_test_case!(
     #[test]
-    #[ignore]
     multiple_files_several_matches_inverted_flag(
         pattern = "a",
         flags = ["-v"],
@@ -459,7 +457,6 @@ set_up_test_case!(
 
 set_up_test_case!(
     #[test]
-    #[ignore]
     multiple_files_one_match_match_entire_lines_flag(
         pattern = "But I beseech your grace that I may know",
         flags = ["-x"],
@@ -470,7 +467,6 @@ set_up_test_case!(
 
 set_up_test_case!(
     #[test]
-    #[ignore]
     multiple_files_one_match_multiple_flags(
         pattern = "WITH LOSS OF EDEN, TILL ONE GREATER MAN",
         flags = ["-n", "-i", "-x"],
@@ -481,7 +477,6 @@ set_up_test_case!(
 
 set_up_test_case!(
     #[test]
-    #[ignore]
     multiple_files_no_matches_various_flags(
         pattern = "Frodo",
         flags = ["-n", "-i", "-x", "-l"],
@@ -492,7 +487,6 @@ set_up_test_case!(
 
 set_up_test_case!(
     #[test]
-    #[ignore]
     multiple_files_several_matches_file_flag_takes_precedence_over_line_number_flag(
         pattern = "who",
         flags = ["-n", "-l"],
@@ -503,7 +497,6 @@ set_up_test_case!(
 
 set_up_test_case!(
     #[test]
-    #[ignore]
     multiple_files_several_matches_inverted_and_match_entire_lines_flags(
         pattern = "Illustrious into Ades premature,",
         flags = ["-x", "-v"],
