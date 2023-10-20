@@ -382,7 +382,6 @@ set_up_test_case!(
 
 set_up_test_case!(
     #[test]
-    #[ignore]
     multiple_files_several_matches_print_line_numbers_flag(
         pattern = "that",
         flags = ["-n"],
@@ -408,7 +407,6 @@ set_up_test_case!(
 
 set_up_test_case!(
     #[test]
-    #[ignore]
     multiple_files_several_matches_caseinsensitive_flag(
         pattern = "TO",
         flags = ["-i"],

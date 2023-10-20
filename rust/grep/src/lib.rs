@@ -28,6 +28,20 @@ impl<'a> Flags<'a> {
     }
 }
 
+fn output_str_based_on_total_files(total_files: usize, file: &str, line: &str, flag: &str, num: usize) -> String {
+    if flag == "-n" {
+        if total_files < 2 {
+            format!("{}:", num + 1)
+        } else {
+           format!("{}:{}:", file, num + 1)
+        }
+    } else if total_files < 2 {
+        line.to_string()
+    } else {
+        format!("{}:{}", file, line)
+    }
+}
+
 pub fn grep(pattern: &str, flags: &Flags, files: &[&str]) -> Result<Vec<String>, Error> {
     /*
 1: Modify output (-n, -l)
@@ -51,18 +65,14 @@ pub fn grep(pattern: &str, flags: &Flags, files: &[&str]) -> Result<Vec<String>,
                 let mut result = String::new();
 
                 if flags.has("-n") {
-                    result.push_str(&format!("{}:", num + 1));
+                    result.push_str(output_str_based_on_total_files(total_files, file, line, "-n", num).as_str());
                 }
 
                 if flags.has("-l") {
                     results.push(file.parse()?);
                     break;
                 } else {
-                    if total_files < 2 {
-                        result.push_str(line)
-                    } else {
-                        result.push_str(format!("{}:{}", file, line).as_str())
-                    }
+                    result.push_str(output_str_based_on_total_files(total_files, file, line, "", num).as_str());
                     results.push(result);
                 }
             }
