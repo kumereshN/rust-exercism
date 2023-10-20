@@ -22,10 +22,6 @@ impl<'a> Flags<'a> {
         // Dummy placeholder text
         Self(flags.to_vec())
     }
-
-    fn has(&self, flag: &str) -> bool {
-        self.0.contains(&flag)
-    }
 }
 
 pub fn grep(pattern: &str, flags: &Flags, files: &[&str]) -> Result<Vec<String>, Error> {
@@ -33,44 +29,5 @@ pub fn grep(pattern: &str, flags: &Flags, files: &[&str]) -> Result<Vec<String>,
 1: Modify output (-n, -l)
 2: Pattern matching (-i, -v, -x)
 */
-    let mut results: Vec<String> = vec![];
 
-    let flag = if flags.has("-i") { "(?i)" } else { "" };
-    let match_entire_line = if flags.has("-x") { "^" } else { "" };
-    let pattern = Regex::new(&format!("{}{}{}", flag, match_entire_line, pattern))?;
-    let total_files = files.len();
-
-
-    for file in files {
-        let file_content = fs::read_to_string(file)?;
-
-        for (num, line) in file_content.lines().enumerate() {
-            let matches = pattern.is_match(line);
-
-            if matches != flags.has("-v") {
-                let mut result = String::new();
-
-                if flags.has("-n") {
-                    if total_files < 2 {
-                        result.push_str(&format!("{}:", num+1));
-                    } else {
-                        result.push_str(&format!("{}:{}:", file, num+1));
-                    }
-                }
-
-                if flags.has("-l") {
-                    results.push(file.parse()?);
-                    break;
-                } else {
-                    if (total_files < 2) | flags.has("-n") {
-                        result.push_str(line);
-                    } else {
-                        result.push_str(&format!("{}:{}", file, line));
-                    }
-                    results.push(result);
-                }
-            }
-        }
-    }
-    Ok(results)
 }
