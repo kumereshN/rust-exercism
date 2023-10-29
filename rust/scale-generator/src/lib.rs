@@ -20,14 +20,14 @@ const FLATS: [&str; 11] = ["F", "Bb", "Eb", "Ab", "Db", "Gb major d", "g", "c", 
 pub struct Error(String);
 
 
-pub struct Scale{
+pub struct Scale<'a>{
     tonic: String,
     intervals: String,
-    scale: Vec<String>
+    scale: Vec<&'a str>
 }
 
-impl Scale {
-    pub fn new(tonic: &str, intervals: &str) -> Result<Scale, Error> {
+impl<'a> Scale<'a> {
+    pub fn new(tonic: &'a str, intervals: &'a str) -> Result<Scale<'a>, Error> {
         if !tonic.is_empty() {
             Ok(
                 Scale {
@@ -48,54 +48,24 @@ impl Scale {
                 Scale {
                     tonic: tonic.to_string(),
                     intervals: "".to_string(),
-                    scale: vec![]
+                    scale: Vec::from(FLAT_CHROMATIC_SCALES)
                 })
             },
             (false, true) => {
-                let tonic_position = FLAT_CHROMATIC_SCALES.iter().position(|&n| n == tonic).unwrap();
-
-                let first_half_scale_vec = FLAT_CHROMATIC_SCALES
-                    .iter()
-                    .take(tonic_position+1)
-                    .map(|&x| x.to_string());
-
-                let second_half_scale_vec = FLAT_CHROMATIC_SCALES
-                    .iter()
-                    .skip(tonic_position)
-                    .take(FLAT_CHROMATIC_SCALES.len()-tonic_position)
-                    .map(|&x| x.to_string());
-
-                let scale_vec: Vec<String> = second_half_scale_vec.chain(first_half_scale_vec).collect();
-
                 Ok(
                 Scale {
                     tonic: tonic.to_string(),
                     intervals: "".to_string(),
-                    scale: scale_vec
+                    scale: Vec::from(FLAT_CHROMATIC_SCALES)
                 }
                 )
             },
             (false, false) => {
-                let tonic_position = SHARP_CHROMATIC_SCALES.iter().position(|&n| n == tonic).unwrap();
-
-                let first_half_scale_vec = SHARP_CHROMATIC_SCALES
-                    .iter()
-                    .take(tonic_position+1)
-                    .map(|&x| x.to_string());
-
-                let second_half_scale_vec = SHARP_CHROMATIC_SCALES
-                    .iter()
-                    .skip(tonic_position)
-                    .take(SHARP_CHROMATIC_SCALES.len()-tonic_position)
-                    .map(|&x| x.to_string());
-
-                let scale_vec: Vec<String> = second_half_scale_vec.chain(first_half_scale_vec).collect();
-
                 Ok(
                 Scale {
                     tonic: tonic.to_string(),
                     intervals: "".to_string(),
-                    scale: scale_vec
+                    scale: Vec::from(SHARP_CHROMATIC_SCALES)
                 })
             },
             _ => Err(Error("Something went wrong".to_string()))
@@ -103,6 +73,21 @@ impl Scale {
     }
 
     pub fn enumerate(&self) -> Vec<String> {
-        self.scale.clone()
+        let scale = self.scale.clone();
+
+        let tonic_position = scale.iter().position(|&n| n == self.tonic).unwrap();
+
+        let first_half_scale_vec = scale
+            .iter()
+            .take(tonic_position+1)
+            .map(|&x| x.to_string());
+
+        let second_half_scale_vec = scale
+            .iter()
+            .skip(tonic_position)
+            .take(scale.len()-tonic_position)
+            .map(|&x| x.to_string());
+
+        second_half_scale_vec.chain(first_half_scale_vec).collect()
     }
 }
