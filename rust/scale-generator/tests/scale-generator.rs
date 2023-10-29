@@ -41,7 +41,6 @@ fn chromatic_scale_with_sharps() {
 }
 
 #[test]
-#[ignore]
 /// Chromatic scale with flats
 fn chromatic_scale_with_flats() {
     process_chromatic_case(
