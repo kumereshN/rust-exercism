@@ -10,11 +10,11 @@
 // errors. Another common idiom is to use a helper type such as failure::Error
 // which does more or less the same thing but automatically.
 
-const SHARP_CHROMATIC_SCALES: [&str; 12] = ["A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"];
-const FLAT_CHROMATIC_SCALES: [&str; 12] = ["A", "Bb", "B", "C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab"];
-const NO_SHARPS_FLATS: [&str; 2] = ["C", "a"];
-const SHARPS: [&str; 11] = ["G", "D", "A", "E", "B", "F# major e", "b", "f#", "c#", "g#", "d# minor"];
-const FLATS: [&str; 11] = ["F", "Bb", "Eb", "Ab", "Db", "Gb major d", "g", "c", "f", "bb", "eb minor"];
+const SHARP_CHROMATIC_SCALES: &[&str; 12] = &["A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"];
+const FLAT_CHROMATIC_SCALES: &[&str; 12] = &["A", "Bb", "B", "C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab"];
+const NO_SHARPS_FLATS: &[&str; 2] = &["C", "a"];
+const SHARPS: &[&str; 11] = &["G", "D", "A", "E", "B", "F# major e", "b", "f#", "c#", "g#", "d# minor"];
+const FLATS: &[&str; 11] = &["F", "Bb", "Eb", "Ab", "Db", "Gb major d", "g", "c", "f", "bb", "eb minor"];
 
 #[derive(Debug)]
 pub struct Error(String);
@@ -23,17 +23,17 @@ pub struct Error(String);
 pub struct Scale<'a>{
     tonic: String,
     intervals: String,
-    scale: Vec<&'a str>
+    scale: &'a[&'a str]
 }
 
 impl<'a> Scale<'a> {
-    pub fn new(tonic: &'a str, intervals: &'a str) -> Result<Scale<'a>, Error> {
+    pub fn new(tonic: &str, intervals: &str) -> Result<Scale<'a>, Error> {
         if !tonic.is_empty() {
             Ok(
                 Scale {
                     tonic: tonic.to_string(),
                     intervals: intervals.to_string(),
-                    scale: vec![]
+                    scale: &["something here"]
                 }
             )
         } else {
@@ -48,7 +48,7 @@ impl<'a> Scale<'a> {
                 Scale {
                     tonic: tonic.to_string(),
                     intervals: "".to_string(),
-                    scale: Vec::from(FLAT_CHROMATIC_SCALES)
+                    scale: SHARP_CHROMATIC_SCALES
                 })
             },
             (false, true) => {
@@ -56,7 +56,7 @@ impl<'a> Scale<'a> {
                 Scale {
                     tonic: tonic.to_string(),
                     intervals: "".to_string(),
-                    scale: Vec::from(FLAT_CHROMATIC_SCALES)
+                    scale: FLAT_CHROMATIC_SCALES
                 }
                 )
             },
@@ -65,7 +65,7 @@ impl<'a> Scale<'a> {
                 Scale {
                     tonic: tonic.to_string(),
                     intervals: "".to_string(),
-                    scale: Vec::from(SHARP_CHROMATIC_SCALES)
+                    scale: SHARP_CHROMATIC_SCALES
                 })
             },
             _ => Err(Error("Something went wrong".to_string()))
