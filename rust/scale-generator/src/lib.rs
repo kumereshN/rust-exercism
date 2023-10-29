@@ -73,7 +73,7 @@ impl<'a> Scale<'a> {
     }
 
     pub fn enumerate(&self) -> Vec<String> {
-        let scale = self.scale.clone();
+        let scale = self.scale;
 
         let tonic_position = scale.iter().position(|&n| n == self.tonic).unwrap();
 
