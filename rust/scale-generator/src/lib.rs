@@ -22,54 +22,48 @@ pub struct Error(String);
 
 pub struct Scale<'a>{
     tonic: String,
-    intervals: String,
+    intervals: &'a str,
     scale: &'a[&'a str]
 }
 
 impl<'a> Scale<'a> {
-    pub fn new(tonic: &str, intervals: &str) -> Result<Scale<'a>, Error> {
+    pub fn new(tonic: &str, intervals: &'a str) -> Result<Scale<'a>, Error> {
         if !tonic.is_empty() {
-            Ok(
-                Scale {
-                    tonic: tonic.to_string(),
-                    intervals: intervals.to_string(),
-                    scale: &["something here"]
-                }
-            )
+            match (SHARPS.contains(&tonic), FLATS.contains(&tonic)) {
+                (true, false) => {
+                    Ok(
+                        Scale {
+                            tonic: tonic.to_string(),
+                            intervals,
+                            scale: SHARP_CHROMATIC_SCALES
+                        })
+                },
+                (false, true) => {
+                    Ok(
+                        Scale {
+                            tonic: tonic.to_string(),
+                            intervals,
+                            scale: FLAT_CHROMATIC_SCALES
+                        }
+                    )
+                },
+                (false, false) => {
+                    Ok(
+                        Scale {
+                            tonic: tonic.to_string(),
+                            intervals,
+                            scale: SHARP_CHROMATIC_SCALES
+                        })
+                },
+                _ => Err(Error("Something went wrong".to_string()))
+            }
         } else {
             Err(Error("Something went wrong".to_string()))
         }
     }
 
     pub fn chromatic(tonic: &str) -> Result<Scale, Error> {
-        match (SHARPS.contains(&tonic), FLATS.contains(&tonic)) {
-            (true, false) => {
-                Ok(
-                Scale {
-                    tonic: tonic.to_string(),
-                    intervals: "".to_string(),
-                    scale: SHARP_CHROMATIC_SCALES
-                })
-            },
-            (false, true) => {
-                Ok(
-                Scale {
-                    tonic: tonic.to_string(),
-                    intervals: "".to_string(),
-                    scale: FLAT_CHROMATIC_SCALES
-                }
-                )
-            },
-            (false, false) => {
-                Ok(
-                Scale {
-                    tonic: tonic.to_string(),
-                    intervals: "".to_string(),
-                    scale: SHARP_CHROMATIC_SCALES
-                })
-            },
-            _ => Err(Error("Something went wrong".to_string()))
-        }
+        Scale::new(tonic, "")
     }
 
     pub fn enumerate(&self) -> Vec<String> {
