@@ -69,9 +69,19 @@ impl<'a> Scale<'a> {
     pub fn enumerate(&self) -> Vec<String> {
         let scale = self.scale;
         let scale_len = scale.len();
-        let intervals_len = self.intervals.len();
+        let tonic: String = self.tonic
+            .chars()
+            .enumerate()
+            .map(|(i, c)|{
+                if i == 0 {
+                    c.to_ascii_uppercase()
+                } else {
+                    c
+                }
+            })
+            .collect();
 
-        let tonic_position = scale.iter().position(|&n| n == self.tonic).unwrap();
+        let tonic_position = scale.iter().position(|&n| n == tonic).unwrap();
 
         if self.intervals.is_empty() {
             scale
@@ -97,6 +107,9 @@ impl<'a> Scale<'a> {
                     }
                     'm' => {
                         res.push(scale_iter.next().unwrap().to_string())
+                    },
+                    'A' => {
+                        res.push(scale_iter.nth(2).unwrap().to_string())
                     },
                     _ => panic!("Something went wrong")
                 }
