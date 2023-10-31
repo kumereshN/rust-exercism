@@ -71,17 +71,13 @@ impl<'a> Scale<'a> {
 
         let tonic_position = scale.iter().position(|&n| n == self.tonic).unwrap();
 
-        let first_half_scale_vec = scale
+        
+        scale
             .iter()
-            .take(tonic_position+1)
-            .map(|&x| x.to_string());
-
-        let second_half_scale_vec = scale
-            .iter()
+            .cycle()
             .skip(tonic_position)
-            .take(scale.len()-tonic_position)
-            .map(|&x| x.to_string());
-
-        second_half_scale_vec.chain(first_half_scale_vec).collect()
+            .take(scale.len()+1)
+            .map(|&c| c.to_string())
+            .collect()
     }
 }
