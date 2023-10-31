@@ -56,7 +56,6 @@ fn chromatic_scale_with_flats() {
 // traversals of the scale.
 
 #[test]
-#[ignore]
 /// Simple major scale
 ///
 /// The simplest major scale, with no sharps or flats.
@@ -65,21 +64,18 @@ fn simple_major_scale() {
 }
 
 #[test]
-#[ignore]
 /// Major scale with sharps
 fn major_scale_with_sharps() {
     process_interval_case("G", "MMmMMMm", &["G", "A", "B", "C", "D", "E", "F#", "G"]);
 }
 
 #[test]
-#[ignore]
 /// Major scale with flats
 fn major_scale_with_flats() {
     process_interval_case("F", "MMmMMMm", &["F", "G", "A", "Bb", "C", "D", "E", "F"]);
 }
 
 #[test]
-#[ignore]
 /// Minor scale with sharps
 fn minor_scale_with_sharps() {
     process_interval_case(

@@ -68,16 +68,40 @@ impl<'a> Scale<'a> {
 
     pub fn enumerate(&self) -> Vec<String> {
         let scale = self.scale;
+        let scale_len = scale.len();
+        let intervals_len = self.intervals.len();
 
         let tonic_position = scale.iter().position(|&n| n == self.tonic).unwrap();
 
-        
-        scale
-            .iter()
-            .cycle()
-            .skip(tonic_position)
-            .take(scale.len()+1)
-            .map(|&c| c.to_string())
-            .collect()
+        if self.intervals.is_empty() {
+            scale
+                .iter()
+                .cycle()
+                .skip(tonic_position)
+                .take(scale_len+1)
+                .map(|&c| c.to_string())
+                .collect()
+        } else {
+            let mut scale_iter = scale
+                .iter()
+                .cycle()
+                .skip(tonic_position);
+
+            let mut res: Vec<String> = vec![];
+            res.push(scale_iter.next().unwrap().to_string());
+
+            for interval in self.intervals.chars() {
+                match interval{
+                    'M' => {
+                        res.push(scale_iter.nth(1).unwrap().to_string())
+                    }
+                    'm' => {
+                        res.push(scale_iter.next().unwrap().to_string())
+                    },
+                    _ => panic!("Something went wrong")
+                }
+            }
+            res
+        }
     }
 }
