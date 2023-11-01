@@ -21,38 +21,46 @@ pub struct Error(String);
 
 
 pub struct Scale<'a>{
-    tonic: String,
+    tonic: &'a str,
     intervals: &'a str,
     scale: &'a[&'a str]
 }
 
 impl<'a> Scale<'a> {
-    pub fn new(tonic: &str, intervals: &'a str) -> Result<Scale<'a>, Error> {
+    pub fn new(tonic: &'a str, intervals: &'a str) -> Result<Scale<'a>, Error> {
         if !tonic.is_empty() {
-            match (SHARPS.contains(&tonic), FLATS.contains(&tonic)) {
-                (true, false) => {
+            match (SHARPS.contains(&tonic), FLATS.contains(&tonic), NO_SHARPS_FLATS.contains(&tonic)) {
+                (true, false, false) => {
                     Ok(
                         Scale {
-                            tonic: tonic.to_string(),
+                            tonic: tonic,
                             intervals,
                             scale: SHARP_CHROMATIC_SCALES
                         })
                 },
-                (false, true) => {
+                (false, true, false) => {
                     Ok(
                         Scale {
-                            tonic: tonic.to_string(),
+                            tonic: tonic,
                             intervals,
                             scale: FLAT_CHROMATIC_SCALES
                         }
                     )
                 },
-                (false, false) => {
+                (false, false, true) => {
                     Ok(
                         Scale {
-                            tonic: tonic.to_string(),
+                            tonic: tonic,
                             intervals,
                             scale: SHARP_CHROMATIC_SCALES
+                        })
+                },
+                (false, false, false) => {
+                    Ok(
+                        Scale {
+                            tonic: tonic,
+                            intervals,
+                            scale: FLAT_CHROMATIC_SCALES
                         })
                 },
                 _ => Err(Error("Something went wrong".to_string()))

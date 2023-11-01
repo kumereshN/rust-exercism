@@ -138,7 +138,6 @@ fn locrian_mode() {
 }
 
 #[test]
-#[ignore]
 /// Harmonic minor
 ///
 /// Note that this case introduces the augmented second interval (A)
