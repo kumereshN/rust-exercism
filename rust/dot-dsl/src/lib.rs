@@ -1,3 +1,4 @@
+// Alternative using &'a str: https://exercism.org/tracks/rust/exercises/dot-dsl/solutions/rsalmei
 pub mod graph {
     use std::collections::HashMap;
     use crate::graph::graph_items::edge::Edge;
