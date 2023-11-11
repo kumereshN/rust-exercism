@@ -78,6 +78,7 @@ pub fn encode(n: u64) -> String {
 
     let n_string = n.to_string();
     let first_char = n_string.chars().next().unwrap();
+    let first_digit_to_word = ones_number_map.get(&first_char).unwrap();
     let len_of_n_string = n_string.len();
 
     match len_of_n_string {
@@ -87,14 +88,33 @@ pub fn encode(n: u64) -> String {
         2 => {
             double_digits_to_word(n_string, &ones_number_map, &tens_number_map, &twenty_to_ninety_nine_map)
         },
+        // Combine len_of_n_string of 3 and above with .into converting the digit to hundred, thousand ...
         3 => {
-            let first_digit_to_word = ones_number_map.get(&first_char).unwrap();
             let remaining_digits = &n_string[len_of_n_string-2..].parse::<u64>().unwrap();
-            format!("{} hundred {}",
-                    first_digit_to_word,
-                    encode(*remaining_digits)
-            )
+            if remaining_digits > &0 {
+                format!("{} hundred {}",
+                        first_digit_to_word,
+                        encode(*remaining_digits)
+                )
+            } else {
+                format!("{} hundred",
+                        first_digit_to_word
+                )
+            }
         },
+        4 => {
+            let remaining_digits = &n_string[len_of_n_string-3..].parse::<u64>().unwrap();
+            if remaining_digits > &0 {
+                format!("{} thousand {}",
+                        first_digit_to_word,
+                        encode(*remaining_digits)
+                )
+            } else {
+                format!("{} thousand",
+                        first_digit_to_word
+                )
+            }
+        }
         _ => {
             panic!("Something went wrong")
         }
