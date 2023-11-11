@@ -37,6 +37,16 @@ pub fn double_digits_to_word(n_string: String,
     }
 }
 
+pub fn len_to_magnitude<'a>(n: usize) -> &'a str {
+    match n {
+        3 => "hundred",
+        4..=6 => "thousand",
+        7..=9 => "million",
+        10..=12 => "billion",
+        _ => panic!("error")
+    }
+}
+
 pub fn encode(n: u64) -> String {
 
     let ones_number_map: HashMap<char, &str> = HashMap::from([
@@ -76,6 +86,13 @@ pub fn encode(n: u64) -> String {
         ("90", "ninety")
     ]);
 
+    let magnitude_mapping: HashMap<usize, &str> = HashMap::from([
+        (3, "hundred"),
+        (4, "thousand"),
+        (7, "million"),
+        (6, "billion")
+    ]);
+
     let n_string = n.to_string();
     let first_char = n_string.chars().next().unwrap();
     let first_digit_to_word = ones_number_map.get(&first_char).unwrap();
@@ -89,32 +106,23 @@ pub fn encode(n: u64) -> String {
             double_digits_to_word(n_string, &ones_number_map, &tens_number_map, &twenty_to_ninety_nine_map)
         },
         // Combine len_of_n_string of 3 and above with .into converting the digit to hundred, thousand ...
-        3 => {
-            let remaining_digits = &n_string[len_of_n_string-2..].parse::<u64>().unwrap();
+        3..=12 => {
+            let remaining_digits = &n_string[1..].parse::<u64>().unwrap();
+            let magnitude = len_to_magnitude(len_of_n_string);
+
             if remaining_digits > &0 {
-                format!("{} hundred {}",
+                format!("{} {} {}",
                         first_digit_to_word,
+                        magnitude,
                         encode(*remaining_digits)
                 )
             } else {
-                format!("{} hundred",
-                        first_digit_to_word
+                format!("{} {}",
+                        first_digit_to_word,
+                        magnitude
                 )
             }
         },
-        4 => {
-            let remaining_digits = &n_string[len_of_n_string-3..].parse::<u64>().unwrap();
-            if remaining_digits > &0 {
-                format!("{} thousand {}",
-                        first_digit_to_word,
-                        encode(*remaining_digits)
-                )
-            } else {
-                format!("{} thousand",
-                        first_digit_to_word
-                )
-            }
-        }
         _ => {
             panic!("Something went wrong")
         }
