@@ -1,10 +1,5 @@
 use std::collections::HashMap;
 
-pub struct numbers {
-    one: String
-}
-
-
 pub fn encode(n: u64) -> String {
     let len_of_number = n.to_string().len();
     let vec_char = n
@@ -58,12 +53,34 @@ pub fn encode(n: u64) -> String {
         2 => {
             let concat_n = vec_char.iter().map(|&c|c.to_string()).collect::<Vec<String>>().join("");
             let first_char = concat_n.chars().next().unwrap();
+            let last_char = concat_n.chars().last().unwrap();
+
             match first_char {
                 '1' => {
                     tens_number_map.get(concat_n.as_str()).unwrap().to_string()
                 },
+                '2'..='9' => {
+                    if last_char == '0' {
+                        twenty_to_ninety_nine_map.get(concat_n.as_str()).unwrap().to_string()
+                    } else {
+                        concat_n
+                            .chars()
+                            .enumerate()
+                            .fold(String::new(), |mut acc, (i,c) | {
+                                if i == 0 {
+                                    let first_str = *twenty_to_ninety_nine_map.get(format!("{}0",c).as_str()).unwrap();
+                                    acc.push_str(format!("{}-", first_str).as_str())
+                                } else {
+                                    let last_str = *ones_number_map.get(&c).unwrap();
+                                    acc.push_str(last_str)
+                                }
+                                acc
+                        })
+                    }
+
+                },
                 _ => {
-                    twenty_to_ninety_nine_map.get(concat_n.as_str()).unwrap().to_string()
+                    panic!("Error")
                 }
             }
         }
