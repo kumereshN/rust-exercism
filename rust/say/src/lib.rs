@@ -82,6 +82,9 @@ pub fn encode(n: u64) -> String {
                 }
             }
         }
+        3 => {
+            format!("{} hundred", ones_number_map.get(&first_char).unwrap())
+        }
         _ => panic!("Something went wrong")
     }
 }
