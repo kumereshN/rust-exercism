@@ -86,12 +86,6 @@ pub fn encode(n: u64) -> String {
         ("90", "ninety")
     ]);
 
-    let magnitude_mapping: HashMap<usize, &str> = HashMap::from([
-        (3, "hundred"),
-        (4, "thousand"),
-        (7, "million"),
-        (6, "billion")
-    ]);
 
     let n_string = n.to_string();
     let first_char = n_string.chars().next().unwrap();
