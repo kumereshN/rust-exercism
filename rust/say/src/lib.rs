@@ -1,51 +1,39 @@
 use std::collections::HashMap;
 
-pub fn to_word(concat_n: String,
+pub fn double_digits_to_word(n_string: String,
                ones_number_map: &HashMap<char, &str>,
                tens_number_map: &HashMap<&str, &str>,
                twenty_to_ninety_nine_map: &HashMap<&str, &str>) -> String {
-    let len_of_number =concat_n.len();
-    let first_char = concat_n.chars().next().unwrap();
-    let last_char = concat_n.chars().last().unwrap();
 
-    match len_of_number {
-        1 => {
-            ones_number_map.get(&first_char).unwrap().to_string()
+    let first_char = n_string.chars().next().unwrap();
+    let last_char = n_string.chars().last().unwrap();
+
+    match first_char {
+        '1' => {
+            tens_number_map.get(n_string.as_str()).unwrap().to_string()
         },
-        2 => {
-            match first_char {
-                '1' => {
-                    tens_number_map.get(concat_n.as_str()).unwrap().to_string()
-                },
-                '2'..='9' => {
-                    if last_char == '0' {
-                        twenty_to_ninety_nine_map.get(concat_n.as_str()).unwrap().to_string()
-                    } else {
-                        concat_n
-                            .chars()
-                            .enumerate()
-                            .fold(String::new(), |mut acc, (i,c) | {
-                                if i == 0 {
-                                    let first_str = *twenty_to_ninety_nine_map.get(format!("{}0",c).as_str()).unwrap();
-                                    acc.push_str(format!("{}-", first_str).as_str())
-                                } else {
-                                    let last_str = *ones_number_map.get(&c).unwrap();
-                                    acc.push_str(last_str)
-                                }
-                                acc
-                            })
-                    }
-
-                },
-                _ => {
-                    panic!("Error")
-                }
+        '2'..='9' => {
+            if last_char == '0' {
+                twenty_to_ninety_nine_map.get(n_string.as_str()).unwrap().to_string()
+            } else {
+                n_string
+                    .chars()
+                    .enumerate()
+                    .fold(String::new(), |mut acc, (i,c) | {
+                        if i == 0 {
+                            let first_str = *twenty_to_ninety_nine_map.get(format!("{}0",c).as_str()).unwrap();
+                            acc.push_str(format!("{}-", first_str).as_str())
+                        } else {
+                            let last_str = *ones_number_map.get(&c).unwrap();
+                            acc.push_str(last_str)
+                        }
+                        acc
+                    })
             }
+        },
+        _ => {
+            panic!("Error")
         }
-        3 => {
-            format!("{} hundred", ones_number_map.get(&first_char).unwrap())
-        }
-        _ => panic!("Something went wrong")
     }
 }
 
@@ -88,13 +76,27 @@ pub fn encode(n: u64) -> String {
         ("90", "ninety")
     ]);
 
-    let concat_n = n
-        .to_string()
-        .chars()
-        .map(|c| c.to_string())
-        .collect::<Vec<String>>()
-        .join("");
+    let n_string = n.to_string();
+    let first_char = n_string.chars().next().unwrap();
+    let len_of_n_string = n_string.len();
 
-    to_word(concat_n, &ones_number_map, &tens_number_map, &twenty_to_ninety_nine_map)
-
+    match len_of_n_string {
+        1 => {
+            ones_number_map.get(&n_string.chars().next().unwrap()).unwrap().to_string()
+        },
+        2 => {
+            double_digits_to_word(n_string, &ones_number_map, &tens_number_map, &twenty_to_ninety_nine_map)
+        },
+        3 => {
+            let first_digit_to_word = ones_number_map.get(&first_char).unwrap();
+            let remaining_digits = &n_string[len_of_n_string-2..].parse::<u64>().unwrap();
+            format!("{} hundred {}",
+                    first_digit_to_word,
+                    encode(*remaining_digits)
+            )
+        },
+        _ => {
+            panic!("Something went wrong")
+        }
+    }
 }
