@@ -44,17 +44,15 @@ pub fn encode(n: u64) -> String {
         ("90", "ninety")
     ]);
 
+    let concat_n = vec_char.iter().map(|&c|c.to_string()).collect::<Vec<String>>().join("");
+    let first_char = concat_n.chars().next().unwrap();
+    let last_char = concat_n.chars().last().unwrap();
 
     match len_of_number {
         1 => {
-            let first_char = vec_char.first().unwrap();
-            ones_number_map.get(first_char).unwrap().to_string()
+            ones_number_map.get(&first_char).unwrap().to_string()
         },
         2 => {
-            let concat_n = vec_char.iter().map(|&c|c.to_string()).collect::<Vec<String>>().join("");
-            let first_char = concat_n.chars().next().unwrap();
-            let last_char = concat_n.chars().last().unwrap();
-
             match first_char {
                 '1' => {
                     tens_number_map.get(concat_n.as_str()).unwrap().to_string()
