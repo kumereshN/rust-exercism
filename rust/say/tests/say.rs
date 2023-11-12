@@ -69,7 +69,6 @@ fn one_thousand_two_hundred_thirty_four() {
 
 // note, using American style with no and
 #[test]
-#[ignore]
 fn eight_hundred_and_ten_thousand() {
     assert_eq!(
         say::encode(810_000),
@@ -84,13 +83,11 @@ fn one_million() {
 
 // note, using American style with no and
 #[test]
-#[ignore]
 fn one_million_two() {
     assert_eq!(say::encode(1_000_002), String::from("one million two"));
 }
 
 #[test]
-#[ignore]
 fn one_million_two_thousand_three_hundred_forty_five() {
     assert_eq!(
         say::encode(1_002_345),
@@ -99,7 +96,6 @@ fn one_million_two_thousand_three_hundred_forty_five() {
 }
 
 #[test]
-#[ignore]
 fn one_billion() {
     assert_eq!(say::encode(1_000_000_000), String::from("one billion"));
 }

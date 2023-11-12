@@ -90,7 +90,9 @@ pub fn encode(n: u64) -> String {
     let n_string = n.to_string();
     let first_char = n_string.chars().next().unwrap();
     let first_digit_to_word = ones_number_map.get(&first_char).unwrap();
+
     let len_of_n_string = n_string.len();
+
 
     match len_of_n_string {
         1 => {
@@ -99,11 +101,24 @@ pub fn encode(n: u64) -> String {
         2 => {
             double_digits_to_word(n_string, &ones_number_map, &tens_number_map, &twenty_to_ninety_nine_map)
         },
-        // Combine len_of_n_string of 3 and above with .into converting the digit to hundred, thousand ...
+        6 | 9 | 12 => {
+            n_string
+                .chars()
+                .collect::<Vec<char>>()
+                .chunks(3)
+                .map(|c| c.iter().collect::<String>())
+                .fold(String::new(), |mut acc, c| {
+                    let digit_to_word = encode(c.parse::<u64>().unwrap());
+                    let magnitude = len_to_magnitude(len_of_n_string);
+                    let res = format!("{} {}", digit_to_word, magnitude);
+                    acc.push_str(res.as_str());
+                    acc
+                })
+        },
+        // For digits greater than 6 and modulo 3 yields 0, have to do a different method
         3..=12 => {
-            let remaining_digits = &n_string[1..].parse::<u64>().unwrap();
             let magnitude = len_to_magnitude(len_of_n_string);
-
+            let remaining_digits = &n_string[1..].parse::<u64>().unwrap();
             if remaining_digits > &0 {
                 format!("{} {} {}",
                         first_digit_to_word,
