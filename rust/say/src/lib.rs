@@ -43,9 +43,14 @@ pub fn len_to_magnitude<'a>(n: usize) -> &'a str {
         4..=6 => "thousand",
         7..=9 => "million",
         10..=12 => "billion",
+        13..=15 => "trillion",
+        16..=18 => "quadrillion",
+        19..=20 => "quintillion",
         _ => panic!("error in magnitude")
     }
 }
+
+const MAX_U64: u64 = u64::MAX;
 
 pub fn encode(n: u64) -> String {
 
@@ -101,7 +106,7 @@ pub fn encode(n: u64) -> String {
         2 => {
             double_digits_to_word(n_string, &ones_number_map, &tens_number_map, &twenty_to_ninety_nine_map)
         },
-        6 | 9 | 12 => {
+        6 | 9 | 12 | 18 | 21 => {
             n_string
                 .chars()
                 .collect::<Vec<char>>()
@@ -130,7 +135,16 @@ pub fn encode(n: u64) -> String {
         3..=20 => {
             let magnitude = len_to_magnitude(len_of_n_string);
             let remaining_digits = &n_string[1..].parse::<u64>().unwrap();
-            if remaining_digits > &0 {
+            if len_of_n_string == MAX_U64.to_string().len() {
+                let first_two_digits = &n_string[0..2].parse::<u64>().unwrap();
+                let remaining_digits_of_max_u64 = &n_string[2..].parse::<u64>().unwrap();
+                format!("{} {} {}",
+                        encode(*first_two_digits),
+                        magnitude,
+                        encode(*remaining_digits_of_max_u64)
+                )
+            }
+            else if remaining_digits > &0 {
                 format!("{} {} {}",
                         first_digit_to_word,
                         magnitude,
