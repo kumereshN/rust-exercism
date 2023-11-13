@@ -117,7 +117,6 @@ fn test_987654321123() {
   These tests are only if you implemented full parsing for u64 type.
 */
 #[test]
-#[ignore]
 fn max_i64() {
     assert_eq!(
         say::encode(9_223_372_036_854_775_807),

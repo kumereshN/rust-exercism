@@ -43,7 +43,7 @@ pub fn len_to_magnitude<'a>(n: usize) -> &'a str {
         4..=6 => "thousand",
         7..=9 => "million",
         10..=12 => "billion",
-        _ => panic!("error")
+        _ => panic!("error in magnitude")
     }
 }
 
@@ -91,7 +91,7 @@ pub fn encode(n: u64) -> String {
     let first_char = n_string.chars().next().unwrap();
     let first_digit_to_word = ones_number_map.get(&first_char).unwrap();
 
-    let len_of_n_string = n_string.len();
+    let mut len_of_n_string = n_string.len();
 
 
     match len_of_n_string {
@@ -108,15 +108,26 @@ pub fn encode(n: u64) -> String {
                 .chunks(3)
                 .map(|c| c.iter().collect::<String>())
                 .fold(String::new(), |mut acc, c| {
-                    let digit_to_word = encode(c.parse::<u64>().unwrap());
-                    let magnitude = len_to_magnitude(len_of_n_string);
-                    let res = format!("{} {}", digit_to_word, magnitude);
-                    acc.push_str(res.as_str());
+                    let digit_to_string = c.parse::<u64>().unwrap();
+                    if digit_to_string > 0 {
+                        let digit_to_word = encode(digit_to_string);
+                        let magnitude = len_to_magnitude(len_of_n_string);
+                        if len_of_n_string <= 3{
+                            let res = format!("{} ", digit_to_word);
+                            acc.push_str(res.as_str());
+                        } else {
+                            let res = format!("{} {} ", digit_to_word, magnitude);
+                            acc.push_str(res.as_str());
+                            len_of_n_string -= 3;
+                        }
+                    }
                     acc
                 })
+                .trim()
+                .to_string()
         },
         // For digits greater than 6 and modulo 3 yields 0, have to do a different method
-        3..=12 => {
+        3..=20 => {
             let magnitude = len_to_magnitude(len_of_n_string);
             let remaining_digits = &n_string[1..].parse::<u64>().unwrap();
             if remaining_digits > &0 {
