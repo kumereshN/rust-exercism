@@ -144,7 +144,6 @@ fn eight_items() {
 }
 
 #[test]
-#[ignore]
 fn fifteen_items() {
     let max_weight = 750;
     let items = [

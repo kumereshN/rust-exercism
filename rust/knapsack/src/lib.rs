@@ -11,7 +11,7 @@ pub fn knap_sack(max_w:u32, wt: Vec<u32>, val: Vec<u32>, n: usize) -> u32 {
     for i in 1..=n {
         for w in (1..=max_w).rev() {
             if wt[i-1] <= w {
-                dp[w as usize - 1] = max(dp[w as usize - 1], dp[w as usize - wt[i-1] as usize] + val[i-1])
+                dp[w as usize - 1] = max(dp[w as usize - 1], dp[(w as usize - wt[i-1] as usize).saturating_sub(1)] + val[i-1])
             }
         }
     }
