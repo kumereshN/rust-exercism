@@ -1,4 +1,4 @@
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 
 pub enum Category {
     Ones,
@@ -34,6 +34,13 @@ type Dice = [u8; 5];
 pub fn score(_dice: Dice, _category: Category) -> u8 {
     let hashset = _dice.into_iter().collect::<HashSet<u8>>();
 
+    let hmap = _dice
+        .iter()
+        .fold(HashMap::<u8, u8>::new(), |mut acc, n| {
+            *acc.entry(*n).or_insert(0) += 1;
+            acc
+        });
+
     match _category {
         Category::Yacht => {
             if hashset.len() == _category.as_u8() as usize {
@@ -54,6 +61,14 @@ pub fn score(_dice: Dice, _category: Category) -> u8 {
                 } else {
                     0
                 }
+            } else {
+                0
+            }
+        }
+        Category::FourOfAKind => {
+            let highest_count_of_number_tuple = hmap.iter().max_by_key(|(_,&y)|y).unwrap();
+            if highest_count_of_number_tuple.1 >= &4 {
+                highest_count_of_number_tuple.0 * 4
             } else {
                 0
             }
