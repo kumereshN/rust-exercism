@@ -25,6 +25,7 @@ impl Category {
             Category::Fives => 5,
             Category::Sixes => 6,
             Category::Yacht => 1,
+            Category::LittleStraight => 15,
             _ => panic!("Incorrect Category")
         }
     }
@@ -53,14 +54,11 @@ pub fn score(_dice: Dice, _category: Category) -> u8 {
             _dice.into_iter().filter(|&n| n == _category.as_u8()).sum::<u8>()
         },
         Category::FullHouse => {
-            if hashset.len() == 2 {
-                let first_number = *hashset.iter().last().unwrap();
-                let count_of_first_number = _dice.into_iter().filter(|&n| n == first_number).count();
-                if matches!(count_of_first_number, 2 | 3) {
-                    _dice.iter().sum::<u8>()
-                } else {
-                    0
-                }
+            let mut values = hmap.values().collect::<Vec<&u8>>();
+            values.sort_unstable();
+
+            if hmap.len() == 2 && values == vec![&2u8, &3u8]{
+                _dice.iter().sum()
             } else {
                 0
             }
