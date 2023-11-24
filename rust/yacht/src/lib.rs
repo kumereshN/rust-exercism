@@ -27,6 +27,7 @@ impl Category {
             Category::Yacht => 1,
             Category::FourOfAKind => 4,
             Category::LittleStraight => 15,
+            Category::BigStraight => 20,
             _ => panic!("Incorrect Category")
         }
     }
@@ -68,6 +69,20 @@ pub fn score(_dice: Dice, _category: Category) -> u8 {
             let highest_count_of_number_tuple = hmap.iter().max_by_key(|(_,&y)|y).unwrap();
             if highest_count_of_number_tuple.1 >= &Category::FourOfAKind.as_u8() {
                 highest_count_of_number_tuple.0 * Category::FourOfAKind.as_u8()
+            } else {
+                0
+            }
+        },
+        Category::LittleStraight => {
+            if _dice.iter().sum::<u8>() == Category::LittleStraight.as_u8() {
+                30
+            } else {
+                0
+            }
+        },
+        Category::BigStraight => {
+            if _dice.iter().sum::<u8>() == Category::BigStraight.as_u8() {
+                30
             } else {
                 0
             }
