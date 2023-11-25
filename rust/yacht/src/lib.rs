@@ -44,6 +44,8 @@ pub fn score(_dice: Dice, _category: Category) -> u8 {
             acc
         });
 
+    let total_sum = _dice.iter().sum::<u8>();
+
     match _category {
         Category::Yacht => {
             if hashset.len() == _category.as_u8() as usize {
@@ -73,20 +75,16 @@ pub fn score(_dice: Dice, _category: Category) -> u8 {
                 0
             }
         },
-        Category::LittleStraight => {
-            if _dice.iter().sum::<u8>() == Category::LittleStraight.as_u8() {
-                30
-            } else {
-                0
-            }
-        },
-        Category::BigStraight => {
-            if _dice.iter().sum::<u8>() == Category::BigStraight.as_u8() {
-                30
-            } else {
-                0
+        Category::LittleStraight | Category::BigStraight => {
+            let _category_to_u8 = _category.as_u8();
+            match (_category, total_sum == _category_to_u8) {
+                (Category::LittleStraight, true) => {30},
+                (Category::BigStraight, true) => {30},
+                _ => 0
             }
         }
-        _ => todo!("Fill in here")
+        Category::Choice => {
+            total_sum
+        }
     }
 }

@@ -163,14 +163,12 @@ fn no_pairs_but_not_a_big_straight() {
 }
 
 #[test]
-#[ignore]
 fn choice() {
     let expected = 23;
     assert_eq!(score([3, 3, 5, 6, 6], Category::Choice), expected);
 }
 
 #[test]
-#[ignore]
 fn yacht_as_choice() {
     let expected = 10;
     assert_eq!(score([2, 2, 2, 2, 2], Category::Choice), expected);
