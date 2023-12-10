@@ -119,7 +119,7 @@ pub fn winning_hands<'a>(hands: &[&'a str]) -> Vec<&'a str> {
             })
             .collect::<Vec<Hand>>();
 
-        let mut zip_hands: Vec<(Hand, &str)> = vec_hands
+        let zip_hands: Vec<(Hand, &str)> = vec_hands
             .into_iter()
             .zip(hands)
             .map(|(h, &o)|{
@@ -127,8 +127,8 @@ pub fn winning_hands<'a>(hands: &[&'a str]) -> Vec<&'a str> {
             })
             .collect();
 
-        // zip_hands.sort_unstable_by(|(a, _), (b, _)| b.cmp(a));
-        zip_hands.iter().max_by_key(|(h, _)| h).unwrap().clone()
+        let best_hands = zip_hands.iter().max_by(|(h1, _), (|h2, _)| h1.cmp(h2)).unwrap().1;
+        vec![best_hands]
     }
     // todo!("Out of {hands:?}, which hand wins?")
 }
