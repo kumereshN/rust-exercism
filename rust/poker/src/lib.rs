@@ -34,7 +34,7 @@ enum Hand{
     OnePair(Vec<Card>),
     TwoPair(Vec<Card>),
     ThreeOfAKind(Vec<Card>),
-    Straight(Vec<Card>),
+    Straight(u32),
     Flush(Vec<Card>),
     FullHouse(Vec<Card>),
     FourOfAKind(Vec<Card>),
@@ -60,7 +60,32 @@ impl Hand {
             [3, ..] => Hand::ThreeOfAKind(cards),
             [2,2, ..] => Hand::TwoPair(cards),
             [2, ..] => Hand::OnePair(cards),
-            [1, ..] => Hand::HighCard(cards),
+            [1, ..] => {
+                let total_seq_of_cards: u32 = cards
+                    .windows(2)
+                    .filter_map(|c|{
+                        let (c1, c2) = (c[0], c[1]);
+                        match (c1, c2) {
+                            (Card::Number(x), Card::Number(y)) => {
+                                let seq = y.saturating_sub(x);
+                                if seq == 1 {
+                                    Some(seq)
+                                } else {
+                                    None
+                                }
+                            }
+                            _ => None
+                        }
+                    })
+                    .sum();
+
+                if total_seq_of_cards > 0 {
+                    Hand::Straight(total_seq_of_cards + 1)
+                } else {
+                    Hand::OnePair(cards)
+                }
+
+            },
             _ => panic!("Can't build hand from {cards:?} and {sorted_counts:?}")
         }
 
@@ -94,7 +119,7 @@ pub fn winning_hands<'a>(hands: &[&'a str]) -> Vec<&'a str> {
             })
             .collect::<Vec<Hand>>();
 
-        let zip_hands: Vec<(Hand, &str)> = vec_hands
+        let mut zip_hands: Vec<(Hand, &str)> = vec_hands
             .into_iter()
             .zip(hands)
             .map(|(h, &o)|{
@@ -102,8 +127,8 @@ pub fn winning_hands<'a>(hands: &[&'a str]) -> Vec<&'a str> {
             })
             .collect();
 
-
-        vec!["abc"]
+        // zip_hands.sort_unstable_by(|(a, _), (b, _)| b.cmp(a));
+        zip_hands.iter().max_by_key(|(h, _)| h).unwrap().clone()
     }
     // todo!("Out of {hands:?}, which hand wins?")
 }
