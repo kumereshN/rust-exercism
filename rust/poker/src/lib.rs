@@ -1,4 +1,5 @@
 use std::collections::{HashMap, HashSet};
+use itertools::Itertools;
 
 /// Given a list of poker hands, return a list of those hands which win.
 ///
@@ -49,10 +50,12 @@ impl Hand {
                 *acc.entry(*c).or_default() += 1;
                 acc
             });
-        let sorted_counts: Vec<u32> = counts
+        let mut sorted_counts: Vec<u32> = counts
             .drain()
             .map(|(_k, v)| v)
             .collect();
+
+        sorted_counts.sort_unstable_by(|a, b| Ord::cmp(&b, &a));
 
         match sorted_counts.as_slice() {
             [4, ..] => Hand::FourOfAKind(cards),
@@ -127,8 +130,13 @@ pub fn winning_hands<'a>(hands: &[&'a str]) -> Vec<&'a str> {
             })
             .collect();
 
-        let best_hands = zip_hands.iter().max_by(|(h1, _), (|h2, _)| h1.cmp(h2)).unwrap().1;
-        vec![best_hands]
+        zip_hands
+            .iter()
+            .max_set_by(|(h1, _), (|h2, _)| h1.cmp(h2))
+            .iter()
+            .map(|(_, h)| *h)
+            .collect::<Vec<&str>>()
+
     }
     // todo!("Out of {hands:?}, which hand wins?")
 }
