@@ -1,3 +1,4 @@
+use std::cmp::Ordering;
 use std::collections::{HashMap, HashSet};
 use itertools::Itertools;
 
@@ -35,7 +36,7 @@ enum Hand{
     OnePair(Vec<Card>),
     TwoPair(Vec<Card>),
     ThreeOfAKind(Vec<Card>),
-    Straight(u32),
+    Straight((Vec<Card>,u32)),
     Flush(Vec<Card>),
     FullHouse(Vec<Card>),
     FourOfAKind(Vec<Card>),
@@ -83,11 +84,13 @@ impl Hand {
                     .sum();
 
                 if total_seq_of_cards > 0 {
-                    Hand::Straight(total_seq_of_cards + 1)
+                    Hand::Straight((cards, total_seq_of_cards + 1))
                 } else {
                     Hand::OnePair(cards)
                 }
-
+            }
+            [0, ..] => {
+                Hand::HighCard(cards)
             },
             _ => panic!("Can't build hand from {cards:?} and {sorted_counts:?}")
         }
@@ -132,7 +135,20 @@ pub fn winning_hands<'a>(hands: &[&'a str]) -> Vec<&'a str> {
 
         zip_hands
             .iter()
-            .max_set_by(|(h1, _), (|h2, _)| h1.cmp(h2))
+            .max_set_by(|(h1, _), (|h2, _)| {
+                match (h1, h2) {
+                    (Hand::Straight(c1), Hand::Straight(c2)) => {
+                        let (c1_card, c1_seq) = (&c1.0, c1.1);
+                        let (c2_card, c2_seq) = (&c2.0, c2.1);
+                        if c1_seq.cmp(&c2_seq) == Ordering::Equal {
+                            c1_card.cmp(&c2_card)
+                        } else {
+                            c1_seq.cmp(&c2_seq)
+                        }
+                    }
+                    _ => h1.cmp(h2)
+                }
+            })
             .iter()
             .map(|(_, h)| *h)
             .collect::<Vec<&str>>()
