@@ -44,7 +44,7 @@ enum Hand{
 }
 
 impl Hand {
-    fn from_cards(cards: Vec<Card>) -> Self {
+    fn from_cards(mut cards: Vec<Card>) -> Self {
         let mut counts = cards
             .iter()
             .fold(HashMap::<Card, u32>::new(), |mut acc, c| {
@@ -65,6 +65,7 @@ impl Hand {
             [2,2, ..] => Hand::TwoPair(cards),
             [2, ..] => Hand::OnePair(cards),
             [1, ..] => {
+                cards.sort_unstable_by(|a, b| Ord::cmp(&a, &b));
                 let total_seq_of_cards: u32 = cards
                     .windows(2)
                     .filter_map(|c|{
@@ -83,15 +84,12 @@ impl Hand {
                     })
                     .sum();
 
-                if total_seq_of_cards > 0 {
+                if total_seq_of_cards == 5 {
                     Hand::Straight((cards, total_seq_of_cards + 1))
                 } else {
-                    Hand::OnePair(cards)
+                    Hand::HighCard(cards)
                 }
             }
-            [0, ..] => {
-                Hand::HighCard(cards)
-            },
             _ => panic!("Can't build hand from {cards:?} and {sorted_counts:?}")
         }
 
