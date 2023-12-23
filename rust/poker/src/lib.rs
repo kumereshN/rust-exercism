@@ -1,12 +1,10 @@
 use std::cmp::Ordering;
 use std::collections::{HashMap, HashSet};
 use itertools::Itertools;
-
 /// Given a list of poker hands, return a list of those hands which win.
 ///
 /// Note the type signature: this function should return _the same_ reference to
 /// the winning hand(s) as were passed in, not reconstructed strings which happen to be equal.
-
 #[derive(Copy, Clone, PartialOrd, PartialEq, Ord, Eq, Hash, Debug)]
 enum Card{
     Number(u32),
@@ -114,11 +112,11 @@ pub fn winning_hands<'a>(hands: &[&'a str]) -> Vec<&'a str> {
             .map(|&h| {
                 Hand::from_cards(
                     h
-                    .chars()
-                    .filter_map(|c|{
-                        Card::from_char(c)
-                    })
-                    .collect::<Vec<Card>>()
+                        .chars()
+                        .filter_map(|c|{
+                            Card::from_char(c)
+                        })
+                        .collect::<Vec<Card>>()
                 )
             })
             .collect::<Vec<Hand>>();
