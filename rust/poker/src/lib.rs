@@ -137,11 +137,39 @@ pub fn winning_hands<'a>(hands: &[&'a str]) -> Vec<&'a str> {
                         let (c1_card, c1_seq) = (&c1.0, c1.1);
                         let (c2_card, c2_seq) = (&c2.0, c2.1);
                         if c1_seq.cmp(&c2_seq) == Ordering::Equal {
-                            c1_card.cmp(&c2_card)
+                            c1_card.cmp(c2_card)
                         } else {
                             c1_seq.cmp(&c2_seq)
                         }
-                    }
+                    },
+                    (Hand::HighCard(c1), Hand::HighCard(c2)) => {
+                        let chain = c1
+                            .iter()
+                            .zip(c2)
+                            .collect::<Vec<(&Card, &Card)>>();
+
+                        let mut c1_count: u8 = 0;
+                        let mut c2_count: u8 = 0;
+
+                        for (&c1, &c2) in chain.iter() {
+                            match c1.cmp(&c2) {
+                                Ordering::Greater => {
+                                    c1_count += 1;
+                                    c2_count = c2_count.saturating_sub(1);
+                                },
+                                Ordering::Less => {
+                                    c2_count += 1;
+                                    c1_count = c1_count.saturating_sub(1);
+                                }
+                                _ => ()
+                            }
+                        }
+                       if c1_count.cmp(&c2_count) == Ordering::Equal {
+                           c1.iter().last().cmp(&c2.iter().last())
+                       } else {
+                           c1_count.cmp(&c2_count)
+                       }
+                    },
                     _ => h1.cmp(h2)
                 }
             })
