@@ -31,7 +31,7 @@ impl Card {
 #[derive(PartialOrd, PartialEq, Ord, Eq)]
 enum Hand{
     HighCard(Vec<Card>),
-    OnePair(Vec<Card>),
+    OnePair(Vec<Card>, Card),
     TwoPair(Vec<Card>),
     ThreeOfAKind(Vec<Card>),
     Straight((Vec<Card>,u32)),
@@ -43,15 +43,15 @@ enum Hand{
 
 impl Hand {
     fn from_cards(mut cards: Vec<Card>) -> Self {
-        let mut counts = cards
+        let counts = cards
             .iter()
             .fold(HashMap::<Card, u32>::new(), |mut acc, c| {
                 *acc.entry(*c).or_default() += 1;
                 acc
             });
         let mut sorted_counts: Vec<u32> = counts
-            .drain()
-            .map(|(_k, v)| v)
+            .iter()
+            .map(|(_k, &v)| v)
             .collect();
 
         sorted_counts.sort_unstable_by(|a, b| Ord::cmp(&b, &a));
@@ -61,7 +61,10 @@ impl Hand {
             [3,2, ..] => Hand::FullHouse(cards),
             [3, ..] => Hand::ThreeOfAKind(cards),
             [2,2, ..] => Hand::TwoPair(cards),
-            [2, ..] => Hand::OnePair(cards),
+            [2, ..] => {
+                let one_pair_card = *counts.iter().max_by_key(|(_, &count)| count).unwrap().0;
+                Hand::OnePair(cards, one_pair_card)
+            },
             [1, ..] => {
                 cards.sort_unstable_by(|a, b| Ord::cmp(&a, &b));
                 let total_seq_of_cards: u32 = cards
@@ -170,6 +173,9 @@ pub fn winning_hands<'a>(hands: &[&'a str]) -> Vec<&'a str> {
                            c1_count.cmp(&c2_count)
                        }
                     },
+                    (Hand::OnePair(_v1, one_pair_card_1), Hand::OnePair(_v2, one_pair_card_2)) => {
+                        one_pair_card_1.cmp(one_pair_card_2)
+                    }
                     _ => h1.cmp(h2)
                 }
             })

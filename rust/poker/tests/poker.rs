@@ -57,7 +57,6 @@ fn one_pair_beats_high_card() {
 }
 
 #[test]
-#[ignore]
 fn highest_pair_wins() {
     let input = &["4S 2H 6S 2D JH", "2S 4H 6C 4D JD"];
     let output = winning_hands(input).into_iter().collect::<HashSet<_>>();
@@ -66,7 +65,6 @@ fn highest_pair_wins() {
 }
 
 #[test]
-#[ignore]
 fn both_hands_have_the_same_pair_high_card_wins() {
     let input = &["4H 4S AH JC 3D", "4C 4D AS 5D 6C"];
     let output = winning_hands(input).into_iter().collect::<HashSet<_>>();
@@ -75,7 +73,6 @@ fn both_hands_have_the_same_pair_high_card_wins() {
 }
 
 #[test]
-#[ignore]
 fn two_pairs_beats_one_pair() {
     let input = &["2S 8H 6S 8D JH", "4S 5H 4C 8C 5C"];
     let output = winning_hands(input).into_iter().collect::<HashSet<_>>();
