@@ -32,7 +32,7 @@ impl Card {
 enum Hand{
     HighCard(Vec<Card>),
     OnePair(Vec<Card>, Card),
-    TwoPair(Vec<Card>),
+    TwoPair(Vec<Card>, Card),
     ThreeOfAKind(Vec<Card>),
     Straight((Vec<Card>,u32)),
     Flush(Vec<Card>),
@@ -54,19 +54,22 @@ impl Hand {
             .map(|(_k, &v)| v)
             .collect();
 
+        cards.sort_unstable_by(|a, b| Ord::cmp(&a, &b));
         sorted_counts.sort_unstable_by(|a, b| Ord::cmp(&b, &a));
 
         match sorted_counts.as_slice() {
             [4, ..] => Hand::FourOfAKind(cards),
             [3,2, ..] => Hand::FullHouse(cards),
             [3, ..] => Hand::ThreeOfAKind(cards),
-            [2,2, ..] => Hand::TwoPair(cards),
+            [2,2, ..] => {
+                let max_two_pair_cards = *counts.iter().filter(|(_, &count)| count == 2).max().unwrap().0;
+                Hand::TwoPair(cards, max_two_pair_cards)
+            },
             [2, ..] => {
                 let one_pair_card = *counts.iter().max_by_key(|(_, &count)| count).unwrap().0;
                 Hand::OnePair(cards, one_pair_card)
             },
             [1, ..] => {
-                cards.sort_unstable_by(|a, b| Ord::cmp(&a, &b));
                 let total_seq_of_cards: u32 = cards
                     .windows(2)
                     .filter_map(|c|{
@@ -94,6 +97,45 @@ impl Hand {
             _ => panic!("Can't build hand from {cards:?} and {sorted_counts:?}")
         }
 
+    }
+    fn compare_against_high_cards(hand_one: &[Card], hand_two: &[Card]) -> Ordering {
+        let chain = hand_one
+            .iter()
+            .zip(hand_two)
+            .collect::<Vec<(&Card, &Card)>>();
+
+        let mut c1_count: u8 = 0;
+        let mut c2_count: u8 = 0;
+
+        for (&c1, &c2) in chain.iter() {
+            match c1.cmp(&c2) {
+                Ordering::Greater => {
+                    c1_count += 1;
+                    c2_count = c2_count.saturating_sub(1);
+                },
+                Ordering::Less => {
+                    c2_count += 1;
+                    c1_count = c1_count.saturating_sub(1);
+                }
+                _ => ()
+            }
+        }
+        if c1_count.cmp(&c2_count) == Ordering::Equal {
+            hand_one.iter().last().cmp(&hand_two.iter().last())
+        } else {
+            c1_count.cmp(&c2_count)
+        }
+    }
+    fn compare_against_pair_cards(hand_one: &[Card], max_pair_card_1: &Card, hand_two: &[Card], max_pair_card_2: &Card) -> Ordering {
+        if max_pair_card_1.cmp(max_pair_card_2) == Ordering::Equal {
+
+            let kicker_cards_vec_1 = hand_one.iter().filter(|&c| c != max_pair_card_1).copied().collect::<Vec<Card>>();
+            let kicker_cards_vec_2 = hand_two.iter().filter(|&c| c != max_pair_card_2).copied().collect::<Vec<Card>>();
+
+            Hand::compare_against_high_cards(&kicker_cards_vec_1, &kicker_cards_vec_2)
+        } else {
+            max_pair_card_1.cmp(max_pair_card_2)
+        }
     }
 }
 
@@ -146,35 +188,13 @@ pub fn winning_hands<'a>(hands: &[&'a str]) -> Vec<&'a str> {
                         }
                     },
                     (Hand::HighCard(c1), Hand::HighCard(c2)) => {
-                        let chain = c1
-                            .iter()
-                            .zip(c2)
-                            .collect::<Vec<(&Card, &Card)>>();
-
-                        let mut c1_count: u8 = 0;
-                        let mut c2_count: u8 = 0;
-
-                        for (&c1, &c2) in chain.iter() {
-                            match c1.cmp(&c2) {
-                                Ordering::Greater => {
-                                    c1_count += 1;
-                                    c2_count = c2_count.saturating_sub(1);
-                                },
-                                Ordering::Less => {
-                                    c2_count += 1;
-                                    c1_count = c1_count.saturating_sub(1);
-                                }
-                                _ => ()
-                            }
-                        }
-                       if c1_count.cmp(&c2_count) == Ordering::Equal {
-                           c1.iter().last().cmp(&c2.iter().last())
-                       } else {
-                           c1_count.cmp(&c2_count)
-                       }
+                        Hand::compare_against_high_cards(c1, c2)
                     },
-                    (Hand::OnePair(_v1, one_pair_card_1), Hand::OnePair(_v2, one_pair_card_2)) => {
-                        one_pair_card_1.cmp(one_pair_card_2)
+                    (Hand::OnePair(v1, one_pair_card_1), Hand::OnePair(v2, one_pair_card_2)) => {
+                        Hand::compare_against_pair_cards(v1, one_pair_card_1, v2, one_pair_card_2)
+                    },
+                    (Hand::TwoPair(v1, two_pair_card_1), Hand::TwoPair(v2, two_pair_card_2)) => {
+                        Hand::compare_against_pair_cards(v1, two_pair_card_1, v2, two_pair_card_2)
                     }
                     _ => h1.cmp(h2)
                 }
