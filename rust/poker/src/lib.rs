@@ -33,7 +33,7 @@ enum Hand{
     HighCard(Vec<Card>),
     OnePair(Vec<Card>, Card),
     TwoPair(Vec<Card>, Card),
-    ThreeOfAKind(Vec<Card>),
+    ThreeOfAKind(Vec<Card>, Card),
     Straight((Vec<Card>,u32)),
     Flush(Vec<Card>),
     FullHouse(Vec<Card>),
@@ -60,7 +60,10 @@ impl Hand {
         match sorted_counts.as_slice() {
             [4, ..] => Hand::FourOfAKind(cards),
             [3,2, ..] => Hand::FullHouse(cards),
-            [3, ..] => Hand::ThreeOfAKind(cards),
+            [3, ..] => {
+                let max_three_pair_cards = *counts.iter().filter(|(_, &count)| count == 3).max().unwrap().0;
+                Hand::ThreeOfAKind(cards, max_three_pair_cards)
+            },
             [2,2, ..] => {
                 let max_two_pair_cards = *counts.iter().filter(|(_, &count)| count == 2).max().unwrap().0;
                 Hand::TwoPair(cards, max_two_pair_cards)
@@ -86,10 +89,10 @@ impl Hand {
                             _ => None
                         }
                     })
-                    .sum();
+                    .sum::<u32>() + 1;
 
                 if total_seq_of_cards == 5 {
-                    Hand::Straight((cards, total_seq_of_cards + 1))
+                    Hand::Straight((cards, total_seq_of_cards))
                 } else {
                     Hand::HighCard(cards)
                 }
@@ -195,6 +198,9 @@ pub fn winning_hands<'a>(hands: &[&'a str]) -> Vec<&'a str> {
                     },
                     (Hand::TwoPair(v1, two_pair_card_1), Hand::TwoPair(v2, two_pair_card_2)) => {
                         Hand::compare_against_pair_cards(v1, two_pair_card_1, v2, two_pair_card_2)
+                    },
+                    (Hand::ThreeOfAKind(v1, three_pair_card_1), Hand::ThreeOfAKind(v2, three_pair_card_2)) => {
+                        Hand::compare_against_pair_cards(v1, three_pair_card_1, v2, three_pair_card_2)
                     }
                     _ => h1.cmp(h2)
                 }

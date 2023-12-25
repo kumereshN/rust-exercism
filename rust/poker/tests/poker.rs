@@ -129,7 +129,6 @@ fn three_of_a_kind_beats_two_pair() {
 }
 
 #[test]
-#[ignore]
 fn both_hands_have_three_of_a_kind_tie_goes_to_highest_ranked_triplet() {
     let input = &["2S 2H 2C 8D JH", "4S AH AS 8C AD"];
     let output = winning_hands(input).into_iter().collect::<HashSet<_>>();
@@ -138,7 +137,6 @@ fn both_hands_have_three_of_a_kind_tie_goes_to_highest_ranked_triplet() {
 }
 
 #[test]
-#[ignore]
 fn with_multiple_decks_two_players_can_have_same_three_of_a_kind_ties_go_to_highest_remaining_cards(
 ) {
     let input = &["5S AH AS 7C AD", "4S AH AS 8C AD"];
@@ -148,7 +146,6 @@ fn with_multiple_decks_two_players_can_have_same_three_of_a_kind_ties_go_to_high
 }
 
 #[test]
-#[ignore]
 fn a_straight_beats_three_of_a_kind() {
     let input = &["4S 5H 4C 8D 4H", "3S 4D 2S 6D 5C"];
     let output = winning_hands(input).into_iter().collect::<HashSet<_>>();
@@ -157,7 +154,6 @@ fn a_straight_beats_three_of_a_kind() {
 }
 
 #[test]
-#[ignore]
 fn aces_can_end_a_straight_10_j_q_k_a() {
     let input = &["4S 5H 4C 8D 4H", "10D JH QS KD AC"];
     let output = winning_hands(input).into_iter().collect::<HashSet<_>>();
