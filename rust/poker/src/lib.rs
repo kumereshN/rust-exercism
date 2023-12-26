@@ -92,10 +92,10 @@ impl Hand {
                         let v2: u8 = c[1].into();
                         let seq = v2.saturating_sub(v1);
                         // seq >= 4 if there is an ace card in a sequence, consider it a straight
-                        if seq == 1 || seq >= 4 {
-                            Some(1)
-                        } else {
-                            None
+                        match seq {
+                            1 => Some(1),
+                            9 if c[1] == Card::Ace => Some(1),
+                            _ => None
                         }
                     })
                     .sum::<u8>();

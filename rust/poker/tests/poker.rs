@@ -186,7 +186,6 @@ fn both_hands_with_a_straight_tie_goes_to_highest_ranked_card() {
 }
 
 #[test]
-#[ignore]
 fn even_though_an_ace_is_usually_high_a_5_high_straight_is_the_lowest_scoring_straight() {
     let input = &["2H 3C 4D 5D 6H", "4S AH 3S 2D 5H"];
     let output = winning_hands(input).into_iter().collect::<HashSet<_>>();
