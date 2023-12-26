@@ -7,7 +7,7 @@ use itertools::Itertools;
 /// the winning hand(s) as were passed in, not reconstructed strings which happen to be equal.
 #[derive(Copy, Clone, PartialOrd, PartialEq, Ord, Eq, Hash, Debug)]
 enum Card{
-    Number(u32),
+    Number(u8),
     Jack,
     Queen,
     King,
@@ -18,12 +18,24 @@ impl Card {
     fn from_char(c: char) -> Option<Self> {
         match c {
             '1' => Some(Card::Number(10)),
-            '2'..='9' => Some(Card::Number(c.to_digit(10).unwrap())),
+            '2'..='9' => Some(Card::Number(c.to_digit(10).unwrap() as u8)),
             'J' => Some(Card::Jack),
             'Q' => Some(Card::Queen),
             'K' => Some(Card::King),
             'A' => Some(Card::Ace),
             _ => None,
+        }
+    }
+}
+
+impl From<Card> for u8 {
+    fn from(origin: Card) -> u8 {
+        match origin {
+            Card::Ace => 14,
+            Card::King => 13,
+            Card::Queen => 12,
+            Card::Jack => 11,
+            Card::Number(x) => x
         }
     }
 }
@@ -34,7 +46,7 @@ enum Hand{
     OnePair(Vec<Card>, Card),
     TwoPair(Vec<Card>, Card),
     ThreeOfAKind(Vec<Card>, Card),
-    Straight((Vec<Card>,u32)),
+    Straight(Vec<Card>,u8),
     Flush(Vec<Card>),
     FullHouse(Vec<Card>),
     FourOfAKind(Vec<Card>),
@@ -73,26 +85,23 @@ impl Hand {
                 Hand::OnePair(cards, one_pair_card)
             },
             [1, ..] => {
-                let total_seq_of_cards: u32 = cards
+                let total_seq_of_cards: u8 = cards
                     .windows(2)
                     .filter_map(|c|{
-                        let (c1, c2) = (c[0], c[1]);
-                        match (c1, c2) {
-                            (Card::Number(x), Card::Number(y)) => {
-                                let seq = y.saturating_sub(x);
-                                if seq == 1 {
-                                    Some(seq)
-                                } else {
-                                    None
-                                }
-                            }
-                            _ => None
+                        let v1: u8 = c[0].into();
+                        let v2: u8 = c[1].into();
+                        let seq = v2.saturating_sub(v1);
+                        // seq >= 4 if there is an ace card in a sequence, consider it a straight
+                        if seq == 1 || seq >= 4 {
+                            Some(1)
+                        } else {
+                            None
                         }
                     })
-                    .sum::<u32>() + 1;
+                    .sum::<u8>();
 
-                if total_seq_of_cards == 5 {
-                    Hand::Straight((cards, total_seq_of_cards))
+                if total_seq_of_cards == 4 {
+                    Hand::Straight(cards, total_seq_of_cards)
                 } else {
                     Hand::HighCard(cards)
                 }
@@ -181,13 +190,11 @@ pub fn winning_hands<'a>(hands: &[&'a str]) -> Vec<&'a str> {
             .iter()
             .max_set_by(|(h1, _), (|h2, _)| {
                 match (h1, h2) {
-                    (Hand::Straight(c1), Hand::Straight(c2)) => {
-                        let (c1_card, c1_seq) = (&c1.0, c1.1);
-                        let (c2_card, c2_seq) = (&c2.0, c2.1);
-                        if c1_seq.cmp(&c2_seq) == Ordering::Equal {
+                    (Hand::Straight(c1_card, c1_seq), Hand::Straight(c2_card, c2_seq)) => {
+                        if c1_seq.cmp(c2_seq) == Ordering::Equal {
                             c1_card.cmp(c2_card)
                         } else {
-                            c1_seq.cmp(&c2_seq)
+                            c1_seq.cmp(c2_seq)
                         }
                     },
                     (Hand::HighCard(c1), Hand::HighCard(c2)) => {

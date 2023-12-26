@@ -162,7 +162,6 @@ fn aces_can_end_a_straight_10_j_q_k_a() {
 }
 
 #[test]
-#[ignore]
 fn aces_can_start_a_straight_a_2_3_4_5() {
     let input = &["4S 5H 4C 8D 4H", "4D AH 3S 2D 5C"];
     let output = winning_hands(input).into_iter().collect::<HashSet<_>>();
@@ -171,7 +170,6 @@ fn aces_can_start_a_straight_a_2_3_4_5() {
 }
 
 #[test]
-#[ignore]
 fn aces_cannot_be_in_the_middle_of_a_straight_q_k_a_2_3() {
     let input = &["2C 3D 7H 5H 2S", "QS KH AC 2D 3S"];
     let output = winning_hands(input).into_iter().collect::<HashSet<_>>();
@@ -180,7 +178,6 @@ fn aces_cannot_be_in_the_middle_of_a_straight_q_k_a_2_3() {
 }
 
 #[test]
-#[ignore]
 fn both_hands_with_a_straight_tie_goes_to_highest_ranked_card() {
     let input = &["4S 6C 7S 8D 5H", "5S 7H 8S 9D 6H"];
     let output = winning_hands(input).into_iter().collect::<HashSet<_>>();
