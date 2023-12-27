@@ -89,9 +89,6 @@ impl Hand {
                 Hand::OnePair(cards, one_pair_card)
             },
             [1, ..] => {
-                if is_flush {
-                    return Hand::Flush(cards)
-                }
 
                 let total_seq_of_cards: u8 = cards
                     .windows(2)
@@ -107,11 +104,30 @@ impl Hand {
                     })
                     .sum::<u8>();
 
+                match (is_flush, total_seq_of_cards) {
+                    (true, 4 | 12) => {
+                        Hand::StraightFlush(cards)
+                    },
+                    (true, x) if (x != 4) | (x != 12) => {
+                        Hand::Flush(cards)
+                    }
+                    (false, 4 | 12) => {
+                        Hand::Straight(cards, total_seq_of_cards)
+                    },
+                    _ => {
+                        Hand::HighCard(cards)
+                    }
+                }
+
+                /*if is_flush {
+                    return Hand::Flush(cards)
+                }
+
                 if total_seq_of_cards == 4 || total_seq_of_cards == 12 {
                     Hand::Straight(cards, total_seq_of_cards)
                 } else {
                     Hand::HighCard(cards)
-                }
+                }*/
             }
             _ => panic!("Can't build hand from {cards:?} and {sorted_counts:?}")
         }

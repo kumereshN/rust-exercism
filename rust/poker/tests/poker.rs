@@ -266,7 +266,6 @@ fn straight_flush_beats_four_of_a_kind() {
 }
 
 #[test]
-#[ignore]
 fn aces_can_end_a_straight_flush_10_j_q_k_a() {
     let input = &["KC AH AS AD AC", "10C JC QC KC AC"];
     let output = winning_hands(input).into_iter().collect::<HashSet<_>>();
