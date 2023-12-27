@@ -54,7 +54,7 @@ enum Hand{
 }
 
 impl Hand {
-    fn from_cards(mut cards: Vec<Card>) -> Self {
+    fn from_cards(mut cards: Vec<Card>, hands_str: &str) -> Self {
         let counts = cards
             .iter()
             .fold(HashMap::<Card, u32>::new(), |mut acc, c| {
@@ -65,6 +65,10 @@ impl Hand {
             .iter()
             .map(|(_k, &v)| v)
             .collect();
+
+        let suites = hands_str.chars().filter(|c| c.is_alphabetic()).collect::<Vec<char>>();
+
+        let is_flush = Hand::check_for_flush(suites);
 
         cards.sort_unstable_by(|a, b| Ord::cmp(&a, &b));
         sorted_counts.sort_unstable_by(|a, b| Ord::cmp(&b, &a));
@@ -85,22 +89,25 @@ impl Hand {
                 Hand::OnePair(cards, one_pair_card)
             },
             [1, ..] => {
+                if is_flush {
+                    return Hand::Flush(cards)
+                }
+
                 let total_seq_of_cards: u8 = cards
                     .windows(2)
                     .filter_map(|c|{
                         let v1: u8 = c[0].into();
                         let v2: u8 = c[1].into();
                         let seq = v2.saturating_sub(v1);
-                        // seq >= 4 if there is an ace card in a sequence, consider it a straight
                         match seq {
                             1 => Some(1),
-                            9 if c[1] == Card::Ace => Some(1),
+                            9 if c[1] == Card::Ace => Some(9),
                             _ => None
                         }
                     })
                     .sum::<u8>();
 
-                if total_seq_of_cards == 4 {
+                if total_seq_of_cards == 4 || total_seq_of_cards == 12 {
                     Hand::Straight(cards, total_seq_of_cards)
                 } else {
                     Hand::HighCard(cards)
@@ -109,6 +116,13 @@ impl Hand {
             _ => panic!("Can't build hand from {cards:?} and {sorted_counts:?}")
         }
 
+    }
+    fn check_for_flush(cards: Vec<char>) -> bool {
+        cards
+            .windows(2)
+            .all(|s| {
+                s[0] == s[1]
+            })
     }
     fn compare_against_high_cards(hand_one: &[Card], hand_two: &[Card]) -> Ordering {
         let chain = hand_one
@@ -173,7 +187,8 @@ pub fn winning_hands<'a>(hands: &[&'a str]) -> Vec<&'a str> {
                         .filter_map(|c|{
                             Card::from_char(c)
                         })
-                        .collect::<Vec<Card>>()
+                        .collect::<Vec<Card>>(),
+                    h
                 )
             })
             .collect::<Vec<Hand>>();
@@ -186,15 +201,20 @@ pub fn winning_hands<'a>(hands: &[&'a str]) -> Vec<&'a str> {
             })
             .collect();
 
+
+
         zip_hands
             .iter()
             .max_set_by(|(h1, _), (|h2, _)| {
                 match (h1, h2) {
+                    (Hand::Flush(c1), Hand::Flush(c2)) => {
+                        Hand::compare_against_high_cards(c1, c2)
+                    }
                     (Hand::Straight(c1_card, c1_seq), Hand::Straight(c2_card, c2_seq)) => {
-                        if c1_seq.cmp(c2_seq) == Ordering::Equal {
-                            c1_card.cmp(c2_card)
-                        } else {
-                            c1_seq.cmp(c2_seq)
+                        match c1_seq.cmp(c2_seq) {
+                            Ordering::Equal => c1_card.cmp(c2_card),
+                            Ordering::Greater => Ordering::Less,
+                            Ordering::Less => Ordering::Greater
                         }
                     },
                     (Hand::HighCard(c1), Hand::HighCard(c2)) => {

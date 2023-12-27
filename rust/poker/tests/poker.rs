@@ -194,7 +194,6 @@ fn even_though_an_ace_is_usually_high_a_5_high_straight_is_the_lowest_scoring_st
 }
 
 #[test]
-#[ignore]
 fn flush_beats_a_straight() {
     let input = &["4C 6H 7D 8D 5H", "2S 4S 5S 6S 7S"];
     let output = winning_hands(input).into_iter().collect::<HashSet<_>>();
@@ -203,7 +202,6 @@ fn flush_beats_a_straight() {
 }
 
 #[test]
-#[ignore]
 fn both_hands_have_a_flush_tie_goes_to_high_card_down_to_the_last_one_if_necessary() {
     let input = &["2H 7H 8H 9H 6H", "3S 5S 6S 7S 8S"];
     let output = winning_hands(input).into_iter().collect::<HashSet<_>>();
@@ -212,7 +210,6 @@ fn both_hands_have_a_flush_tie_goes_to_high_card_down_to_the_last_one_if_necessa
 }
 
 #[test]
-#[ignore]
 fn full_house_beats_a_flush() {
     let input = &["3H 6H 7H 8H 5H", "4S 5H 4C 5D 4H"];
     let output = winning_hands(input).into_iter().collect::<HashSet<_>>();
@@ -221,7 +218,6 @@ fn full_house_beats_a_flush() {
 }
 
 #[test]
-#[ignore]
 fn both_hands_have_a_full_house_tie_goes_to_highest_ranked_triplet() {
     let input = &["4H 4S 4D 9S 9D", "5H 5S 5D 8S 8D"];
     let output = winning_hands(input).into_iter().collect::<HashSet<_>>();
@@ -230,7 +226,6 @@ fn both_hands_have_a_full_house_tie_goes_to_highest_ranked_triplet() {
 }
 
 #[test]
-#[ignore]
 fn with_multiple_decks_both_hands_have_a_full_house_with_the_same_triplet_tie_goes_to_the_pair() {
     let input = &["5H 5S 5D 9S 9D", "5H 5S 5D 8S 8D"];
     let output = winning_hands(input).into_iter().collect::<HashSet<_>>();
@@ -239,7 +234,6 @@ fn with_multiple_decks_both_hands_have_a_full_house_with_the_same_triplet_tie_go
 }
 
 #[test]
-#[ignore]
 fn four_of_a_kind_beats_a_full_house() {
     let input = &["4S 5H 4D 5D 4H", "3S 3H 2S 3D 3C"];
     let output = winning_hands(input).into_iter().collect::<HashSet<_>>();
@@ -248,7 +242,6 @@ fn four_of_a_kind_beats_a_full_house() {
 }
 
 #[test]
-#[ignore]
 fn both_hands_have_four_of_a_kind_tie_goes_to_high_quad() {
     let input = &["2S 2H 2C 8D 2D", "4S 5H 5S 5D 5C"];
     let output = winning_hands(input).into_iter().collect::<HashSet<_>>();
@@ -257,7 +250,6 @@ fn both_hands_have_four_of_a_kind_tie_goes_to_high_quad() {
 }
 
 #[test]
-#[ignore]
 fn with_multiple_decks_both_hands_with_identical_four_of_a_kind_tie_determined_by_kicker() {
     let input = &["3S 3H 2S 3D 3C", "3S 3H 4S 3D 3C"];
     let output = winning_hands(input).into_iter().collect::<HashSet<_>>();
@@ -266,7 +258,6 @@ fn with_multiple_decks_both_hands_with_identical_four_of_a_kind_tie_determined_b
 }
 
 #[test]
-#[ignore]
 fn straight_flush_beats_four_of_a_kind() {
     let input = &["4S 5H 5S 5D 5C", "7S 8S 9S 6S 10S"];
     let output = winning_hands(input).into_iter().collect::<HashSet<_>>();
