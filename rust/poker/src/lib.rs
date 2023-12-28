@@ -50,8 +50,10 @@ enum Hand{
     Flush(Vec<Card>),
     FullHouse(Vec<Card>),
     FourOfAKind(Vec<Card>),
-    StraightFlush(Vec<Card>)
+    StraightFlush(Vec<Card>, u8)
 }
+
+const SUITES: [char; 4] = ['C', 'S', 'D', 'H'];
 
 impl Hand {
     fn from_cards(mut cards: Vec<Card>, hands_str: &str) -> Self {
@@ -66,9 +68,9 @@ impl Hand {
             .map(|(_k, &v)| v)
             .collect();
 
-        let suites = hands_str.chars().filter(|c| c.is_alphabetic()).collect::<Vec<char>>();
+        let filter_suites = hands_str.chars().filter(|c| SUITES.contains(c)).collect::<Vec<char>>();
 
-        let is_flush = Hand::check_for_flush(suites);
+        let is_flush = Hand::check_for_flush(filter_suites);
 
         cards.sort_unstable_by(|a, b| Ord::cmp(&a, &b));
         sorted_counts.sort_unstable_by(|a, b| Ord::cmp(&b, &a));
@@ -106,7 +108,7 @@ impl Hand {
 
                 match (is_flush, total_seq_of_cards) {
                     (true, 4 | 12) => {
-                        Hand::StraightFlush(cards)
+                        Hand::StraightFlush(cards, total_seq_of_cards)
                     },
                     (true, x) if (x != 4) | (x != 12) => {
                         Hand::Flush(cards)
@@ -118,16 +120,6 @@ impl Hand {
                         Hand::HighCard(cards)
                     }
                 }
-
-                /*if is_flush {
-                    return Hand::Flush(cards)
-                }
-
-                if total_seq_of_cards == 4 || total_seq_of_cards == 12 {
-                    Hand::Straight(cards, total_seq_of_cards)
-                } else {
-                    Hand::HighCard(cards)
-                }*/
             }
             _ => panic!("Can't build hand from {cards:?} and {sorted_counts:?}")
         }
@@ -223,6 +215,13 @@ pub fn winning_hands<'a>(hands: &[&'a str]) -> Vec<&'a str> {
             .iter()
             .max_set_by(|(h1, _), (|h2, _)| {
                 match (h1, h2) {
+                    (Hand::StraightFlush(c1_card, c1_seq), Hand::StraightFlush(c2_card, c2_seq)) => {
+                        match c1_seq.cmp(c2_seq) {
+                            Ordering::Equal => c1_card.cmp(c2_card),
+                            Ordering::Greater => Ordering::Less,
+                            Ordering::Less => Ordering::Greater
+                        }
+                    },
                     (Hand::Flush(c1), Hand::Flush(c2)) => {
                         Hand::compare_against_high_cards(c1, c2)
                     }

@@ -274,7 +274,6 @@ fn aces_can_end_a_straight_flush_10_j_q_k_a() {
 }
 
 #[test]
-#[ignore]
 fn aces_can_start_a_straight_flush_a_2_3_4_5() {
     let input = &["KS AH AS AD AC", "4H AH 3H 2H 5H"];
     let output = winning_hands(input).into_iter().collect::<HashSet<_>>();
@@ -283,7 +282,6 @@ fn aces_can_start_a_straight_flush_a_2_3_4_5() {
 }
 
 #[test]
-#[ignore]
 fn aces_cannot_be_in_the_middle_of_a_straight_flush_q_k_a_2_3() {
     let input = &["2C AC QC 10C KC", "QH KH AH 2H 3H"];
     let output = winning_hands(input).into_iter().collect::<HashSet<_>>();
@@ -292,7 +290,6 @@ fn aces_cannot_be_in_the_middle_of_a_straight_flush_q_k_a_2_3() {
 }
 
 #[test]
-#[ignore]
 fn both_hands_have_a_straight_flush_tie_goes_to_highest_ranked_card() {
     let input = &["4H 6H 7H 8H 5H", "5S 7S 8S 9S 6S"];
     let output = winning_hands(input).into_iter().collect::<HashSet<_>>();
@@ -301,7 +298,6 @@ fn both_hands_have_a_straight_flush_tie_goes_to_highest_ranked_card() {
 }
 
 #[test]
-#[ignore]
 fn even_though_an_ace_is_usually_high_a_5_high_straight_flush_is_the_lowest_scoring_straight_flush()
 {
     let input = &["2H 3H 4H 5H 6H", "4D AD 3D 2D 5D"];
