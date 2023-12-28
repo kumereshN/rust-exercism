@@ -54,6 +54,7 @@ enum Hand{
 }
 
 const SUITES: [char; 4] = ['C', 'S', 'D', 'H'];
+const VALID_SEQUENCE: [u8; 2] = [4, 12];
 
 impl Hand {
     fn from_cards(mut cards: Vec<Card>, hands_str: &str) -> Self {
@@ -91,7 +92,6 @@ impl Hand {
                 Hand::OnePair(cards, one_pair_card)
             },
             [1, ..] => {
-
                 let total_seq_of_cards: u8 = cards
                     .windows(2)
                     .filter_map(|c|{
@@ -106,14 +106,16 @@ impl Hand {
                     })
                     .sum::<u8>();
 
-                match (is_flush, total_seq_of_cards) {
-                    (true, 4 | 12) => {
+                let is_valid_seq = VALID_SEQUENCE.contains(&total_seq_of_cards);
+
+                match (is_flush, is_valid_seq) {
+                    (true, true) => {
                         Hand::StraightFlush(cards, total_seq_of_cards)
                     },
-                    (true, x) if (x != 4) | (x != 12) => {
+                    (true, false) => {
                         Hand::Flush(cards)
                     }
-                    (false, 4 | 12) => {
+                    (false, true) => {
                         Hand::Straight(cards, total_seq_of_cards)
                     },
                     _ => {
