@@ -88,7 +88,6 @@ fn errors_if_dividing_by_zero() {
 }
 
 #[test]
-#[ignore]
 fn addition_and_subtraction() {
     let mut f = Forth::new();
     assert!(f.eval("1 2 + 4 -").is_ok());

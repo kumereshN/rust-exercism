@@ -59,26 +59,30 @@ impl Forth {
             return Ok(())
         }
 
-        if vec_of_nums.len().div_euclid(vec_of_operations.len()) != 2 {
+        if vec_of_nums.len().saturating_sub(1) != (vec_of_operations.len()) {
             return Err(StackUnderflow)
         }
 
-        let res = vec_of_nums
+        let nums_ops_zip = vec_of_nums
             .chunks(2)
-            .zip(vec_of_operations)
-            .map(|(v, o)| {
-                let v1 = v[0];
-                let v2 = v[1];
-                match o {
-                    Operations::Add => v.iter().sum::<Value>(),
-                    Operations::Subtract => {
-                        v1-v2
-                    }
-                    _ => panic!("Something went wrong")
-                }
-            })
-            .collect::<Vec<Value>>();
-        self.res = res;
+            .zip(vec_of_operations);
+
+        let mut res= 0;
+
+        for (v, ops) in nums_ops_zip {
+
+            match (ops, v.len()) {
+                (Operations::Add, _) => res += v.iter().sum::<Value>(),
+                (Operations::Subtract, 2) => res += v[0] - v[1],
+                (Operations::Subtract, _) => res -= v[0],
+                _ => panic!("Operations failed")
+
+            }
+
+        }
+
+
+        self.res = vec![res];
         Ok(())
     }
 }
