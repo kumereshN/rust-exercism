@@ -96,7 +96,6 @@ fn multiplication_and_division() {
 }
 
 #[test]
-#[ignore]
 fn dup() {
     let mut f = Forth::new();
     assert!(f.eval("1 dup").is_ok());
@@ -104,7 +103,6 @@ fn dup() {
 }
 
 #[test]
-#[ignore]
 fn dup_top_value_only() {
     let mut f = Forth::new();
     assert!(f.eval("1 2 dup").is_ok());
@@ -112,7 +110,6 @@ fn dup_top_value_only() {
 }
 
 #[test]
-#[ignore]
 fn dup_case_insensitive() {
     let mut f = Forth::new();
     assert!(f.eval("1 DUP Dup dup").is_ok());

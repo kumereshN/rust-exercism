@@ -45,7 +45,9 @@ impl Forth {
         let last_digit = *vec_of_nums.last().unwrap();
         for ops in vec_of_ops {
             match ops {
-                Operations::Duplicate => res.push(last_digit),
+                Operations::Duplicate => {
+                    res.push(last_digit)
+                },
                 _ => panic!("Invalid ops")
             }
         }
@@ -96,9 +98,7 @@ impl Forth {
             return Ok(())
         }
 
-        if vec_of_nums.len().saturating_sub(1) != (vec_of_operations.len()) {
-            return Err(StackUnderflow)
-        }
+
 
         let is_stack_manipulation = vec_of_operations
             .iter()
@@ -107,9 +107,15 @@ impl Forth {
             });
 
         if !is_stack_manipulation {
+
+            if vec_of_nums.len().saturating_sub(1) != (vec_of_operations.len()) {
+                return Err(StackUnderflow)
+            }
+
             let nums_ops_zip = vec_of_nums
                 .chunks(2)
                 .zip(vec_of_operations);
+
             match Forth::calculate_integer_arithmetic(nums_ops_zip) {
                 Ok(v) => {
                     self.stack = v;
