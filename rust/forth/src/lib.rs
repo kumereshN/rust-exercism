@@ -40,7 +40,17 @@ impl Forth {
         &self.stack
     }
 
-    pub fn stack_manipulation()
+    pub fn stack_manipulation(vec_of_nums: &[Value], vec_of_ops: &[Operations]) -> std::result::Result<Vec<Value>, Error> {
+        let mut res = vec_of_nums.to_vec();
+        let last_digit = *vec_of_nums.last().unwrap();
+        for ops in vec_of_ops {
+            match ops {
+                Operations::Duplicate => res.push(last_digit),
+                _ => panic!("Invalid ops")
+            }
+        }
+        Ok(res)
+    }
 
     pub fn calculate_integer_arithmetic(num_ops_zip: Zip<Chunks<Value>, IntoIter<Operations>>) -> std::result::Result<Vec<Value>, Error> {
         let mut res = 0;
@@ -108,7 +118,13 @@ impl Forth {
                 Err(e) => Err(e)
             }
         } else {
-            Err(Error::UnknownWord)
+            match Forth::stack_manipulation(&vec_of_nums, &vec_of_operations) {
+                Ok(v) => {
+                    self.stack = v;
+                    Ok(())
+                },
+                Err(e) => Err(e)
+            }
         }
     }
 }
