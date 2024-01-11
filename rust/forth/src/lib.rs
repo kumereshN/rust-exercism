@@ -98,8 +98,6 @@ impl Forth {
             return Ok(())
         }
 
-
-
         let is_stack_manipulation = vec_of_operations
             .iter()
             .any(|x| {
@@ -124,6 +122,9 @@ impl Forth {
                 Err(e) => Err(e)
             }
         } else {
+            if vec_of_nums.is_empty() || vec_of_operations.is_empty() {
+                return Err(Error::StackUnderflow)
+            }
             match Forth::stack_manipulation(&vec_of_nums, &vec_of_operations) {
                 Ok(v) => {
                     self.stack = v;
