@@ -1,12 +1,14 @@
 use std::iter::Zip;
 use std::slice::Chunks;
 use std::vec::IntoIter;
+use std::collections::BTreeMap;
 use crate::Error::{DivisionByZero, StackUnderflow};
 
 pub type Value = i32;
 pub type Result = std::result::Result<(), Error>;
-pub struct Forth {
+pub struct Forth<'a> {
     stack: Vec<Value>,
+    btree: BTreeMap<&'a str, Vec<u32>>
 }
 
 #[derive(Debug, PartialEq, Eq)]
@@ -29,10 +31,11 @@ pub enum Operations {
     Over
 }
 
-impl Forth {
-    pub fn new() -> Forth {
+impl<'a> Forth<'a> {
+    pub fn new() -> Forth<'a> {
         Forth {
-            stack: vec![]
+            stack: vec![],
+            btree: BTreeMap::new()
         }
     }
 
@@ -48,6 +51,9 @@ impl Forth {
                 Operations::Duplicate => {
                     res.push(last_digit)
                 },
+                Operations::Drop => {
+                    res.pop();
+                }
                 _ => panic!("Invalid ops")
             }
         }
@@ -88,6 +94,7 @@ impl Forth {
                     "*" => vec_of_operations.push(Operations::Multiply),
                     "/" => vec_of_operations.push(Operations::Divide),
                     "dup" => vec_of_operations.push(Operations::Duplicate),
+                    "drop" => vec_of_operations.push(Operations::Drop),
                     _ => panic!("Error occurred: {}", e)
                 }
             }
