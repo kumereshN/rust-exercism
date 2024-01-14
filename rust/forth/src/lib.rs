@@ -6,9 +6,9 @@ use crate::Error::{DivisionByZero, StackUnderflow};
 
 pub type Value = i32;
 pub type Result = std::result::Result<(), Error>;
-pub struct Forth<'a> {
+pub struct Forth {
     stack: Vec<Value>,
-    btree: BTreeMap<&'a str, Vec<u32>>
+    btree: BTreeMap<Vec<Value>, Operations>
 }
 
 #[derive(Debug, PartialEq, Eq)]
@@ -19,7 +19,7 @@ pub enum Error {
     InvalidWord,
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub enum Operations {
     Add,
     Subtract,
@@ -31,8 +31,8 @@ pub enum Operations {
     Over
 }
 
-impl<'a> Forth<'a> {
-    pub fn new() -> Forth<'a> {
+impl Forth {
+    pub fn new() -> Forth {
         Forth {
             stack: vec![],
             btree: BTreeMap::new()
@@ -43,13 +43,13 @@ impl<'a> Forth<'a> {
         &self.stack
     }
 
-    pub fn stack_manipulation(vec_of_nums: &[Value], vec_of_ops: &[Operations]) -> std::result::Result<Vec<Value>, Error> {
+    pub fn stack_manipulation(vec_of_nums: Vec<Value>, vec_of_ops: &[Operations]) -> std::result::Result<Vec<Value>, Error> {
         let mut res = vec_of_nums.to_vec();
-        let last_digit = *vec_of_nums.last().unwrap();
+        let last_digit = vec_of_nums.last().unwrap();
         for ops in vec_of_ops {
             match ops {
                 Operations::Duplicate => {
-                    res.push(last_digit)
+                    res.push(*last_digit)
                 },
                 Operations::Drop => {
                     res.pop();
@@ -60,10 +60,10 @@ impl<'a> Forth<'a> {
         Ok(res)
     }
 
-    pub fn calculate_integer_arithmetic(num_ops_zip: Zip<Chunks<Value>, IntoIter<Operations>>) -> std::result::Result<Vec<Value>, Error> {
+    pub fn calculate_integer_arithmetic(btree_value_ops: &BTreeMap<Vec<Value>, Operations>) -> std::result::Result<Vec<Value>, Error> {
         let mut res = 0;
 
-        for (v, ops) in num_ops_zip {
+        for (v, ops) in btree_value_ops {
             match (ops, v.len()) {
                 (Operations::Add, _) => res += v.iter().sum::<Value>(),
                 (Operations::Subtract, 2) => res += v[0] - v[1],
@@ -82,26 +82,47 @@ impl<'a> Forth<'a> {
     }
 
     pub fn eval(&mut self, input: &str) -> Result {
-        let mut vec_of_nums = vec![];
-        let mut vec_of_operations = vec![];
+        let mut temp_stack = vec![];
 
         for s in input.split_ascii_whitespace() {
             match s.parse::<Value>() {
-                Ok(n) => vec_of_nums.push(n),
+                Ok(n) => temp_stack.push(n),
                 Err(e) => match s.to_lowercase().as_str() {
-                    "+" => vec_of_operations.push(Operations::Add),
-                    "-" => vec_of_operations.push(Operations::Subtract),
-                    "*" => vec_of_operations.push(Operations::Multiply),
-                    "/" => vec_of_operations.push(Operations::Divide),
-                    "dup" => vec_of_operations.push(Operations::Duplicate),
-                    "drop" => vec_of_operations.push(Operations::Drop),
+                    "+" => {
+                        self.btree.insert(temp_stack.clone(), Operations::Add);
+                        temp_stack.clear()
+                    },
+                    "-" => {
+                        self.btree.insert(temp_stack.clone(), Operations::Subtract);
+                        temp_stack.clear()
+                    },
+                    "*" => {
+                        self.btree.insert(temp_stack.clone(), Operations::Multiply);
+                        temp_stack.clear()
+                    },
+                    "/" => {
+                        self.btree.insert(temp_stack.clone(), Operations::Divide);
+                        temp_stack.clear()
+                    },
+                    "dup" => {
+                        self.btree.insert(temp_stack.clone(), Operations::Duplicate);
+                        temp_stack.clear()
+                    },
+                    "drop" => {
+                        self.btree.insert(temp_stack.clone(), Operations::Drop);
+                        temp_stack.clear()
+                    },
                     _ => panic!("Error occurred: {}", e)
                 }
             }
         }
 
+        let vec_of_nums = self.btree.keys().flatten().cloned().collect::<Vec<Value>>() ;
+        let vec_of_operations = self.btree.values().cloned().collect::<Vec<_>>();
+
+
         if vec_of_operations.is_empty() {
-            self.stack = vec_of_nums;
+            self.stack = temp_stack;
             return Ok(())
         }
 
@@ -117,11 +138,7 @@ impl<'a> Forth<'a> {
                 return Err(StackUnderflow)
             }
 
-            let nums_ops_zip = vec_of_nums
-                .chunks(2)
-                .zip(vec_of_operations);
-
-            match Forth::calculate_integer_arithmetic(nums_ops_zip) {
+            match Forth::calculate_integer_arithmetic(&self.btree) {
                 Ok(v) => {
                     self.stack = v;
                     Ok(())
@@ -132,7 +149,7 @@ impl<'a> Forth<'a> {
             if vec_of_nums.is_empty() || vec_of_operations.is_empty() {
                 return Err(Error::StackUnderflow)
             }
-            match Forth::stack_manipulation(&vec_of_nums, &vec_of_operations) {
+            match Forth::stack_manipulation(vec_of_nums, vec_of_operations.as_slice()) {
                 Ok(v) => {
                     self.stack = v;
                     Ok(())
