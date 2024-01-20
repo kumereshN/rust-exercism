@@ -111,6 +111,15 @@ impl Forth {
                         },
                         Some("-") => {
                             res += first_value - second_value
+                        },
+                        Some("*") => {
+                            res += first_value * second_value
+                        },
+                        Some("/") => {
+                            res += match first_value.checked_div_euclid(*second_value) {
+                                Some(v) => v,
+                                None => return Err(Error::DivisionByZero)
+                            }
                         }
                         _ => panic!("Something went wrong")
                     }
