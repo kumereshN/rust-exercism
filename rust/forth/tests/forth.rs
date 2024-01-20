@@ -89,7 +89,6 @@ fn addition_and_subtraction() {
 }
 
 #[test]
-#[ignore]
 fn multiplication_and_division() {
     let mut f = Forth::new();
     assert!(f.eval("2 4 * 3 /").is_ok());

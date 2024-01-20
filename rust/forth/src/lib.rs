@@ -99,27 +99,38 @@ impl Forth {
                 let mut res = 0;
                 for val in vec_res{
                     let mut split_whitespace_deque = val.split_ascii_whitespace().collect::<VecDeque<&str>>();
-                    let first_two_values_of_split_whitespace_deque= split_whitespace_deque
-                        .drain(0..=1)
+                    let ops = split_whitespace_deque.pop_back();
+                    let len_split_whitespace_deque = split_whitespace_deque.len();
+                    let split_whitespace_deque_parsed = split_whitespace_deque
+                        .iter()
                         .map(|x| x.parse::<Value>().unwrap())
                         .collect::<Vec<Value>>();
-                    let (first_value, second_value) = (first_two_values_of_split_whitespace_deque.first().unwrap_or(&0), first_two_values_of_split_whitespace_deque.get(1).unwrap_or(&0));
+                    let (first_value, second_value) = (split_whitespace_deque_parsed[0], split_whitespace_deque_parsed.get(1).unwrap_or(&-1));
 
-                    match split_whitespace_deque.pop_back() {
-                        Some("+") => {
-                            res += first_two_values_of_split_whitespace_deque.iter().sum::<Value>();
+                    match (ops, len_split_whitespace_deque) {
+                        (Some("+"), _) => {
+                            res += split_whitespace_deque_parsed.iter().sum::<Value>();
                         },
-                        Some("-") => {
+                        (Some("-"), 2) => {
                             res += first_value - second_value
                         },
-                        Some("*") => {
+                        (Some("-"), _) => {
+                            res -= first_value
+                        }
+                        (Some("*"), 2) => {
                             res += first_value * second_value
                         },
-                        Some("/") => {
+                        (Some("*"), _) => {
+                            res *= first_value
+                        },
+                        (Some("/"), 2) => {
                             res += match first_value.checked_div_euclid(*second_value) {
                                 Some(v) => v,
                                 None => return Err(Error::DivisionByZero)
                             }
+                        },
+                        (Some("/"), _) => {
+                            res /= first_value
                         }
                         _ => panic!("Something went wrong")
                     }
