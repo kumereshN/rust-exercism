@@ -1,8 +1,4 @@
-use std::iter::Zip;
-use std::slice::Chunks;
-use std::vec::IntoIter;
-use std::collections::BTreeMap;
-use crate::Error::{DivisionByZero, StackUnderflow};
+use std::collections::{BTreeMap, VecDeque};
 
 pub type Value = i32;
 pub type Result = std::result::Result<(), Error>;
@@ -30,6 +26,9 @@ pub enum Operations {
     Swap,
     Over
 }
+
+const INTEGER_ARITHMETIC: [char; 4] = ['+', '-', '*', '/'];
+const STACK_MANIPULATION: [&str; 4] = ["dup", "drop", "swap", "over"];
 
 impl Forth {
     pub fn new() -> Forth {
@@ -72,7 +71,7 @@ impl Forth {
                 (Operations::Multiply, _) => res *= v[0],
                 (Operations::Divide, 2) => match v[0].checked_div_euclid(v[1]) {
                     Some(v) => res += v,
-                    None => return Err(DivisionByZero)
+                    None => return Err(Error::DivisionByZero)
                 }
                 (Operations::Divide, _) => res /= v[0],
                 _ => panic!("Error occurred in operations")
@@ -82,80 +81,40 @@ impl Forth {
     }
 
     pub fn eval(&mut self, input: &str) -> Result {
-        let mut temp_stack = vec![];
-
-        for s in input.split_ascii_whitespace() {
-            match s.parse::<Value>() {
-                Ok(n) => temp_stack.push(n),
-                Err(e) => match s.to_lowercase().as_str() {
-                    "+" => {
-                        self.btree.insert(temp_stack.clone(), Operations::Add);
-                        temp_stack.clear()
-                    },
-                    "-" => {
-                        self.btree.insert(temp_stack.clone(), Operations::Subtract);
-                        temp_stack.clear()
-                    },
-                    "*" => {
-                        self.btree.insert(temp_stack.clone(), Operations::Multiply);
-                        temp_stack.clear()
-                    },
-                    "/" => {
-                        self.btree.insert(temp_stack.clone(), Operations::Divide);
-                        temp_stack.clear()
-                    },
-                    "dup" => {
-                        self.btree.insert(temp_stack.clone(), Operations::Duplicate);
-                        temp_stack.clear()
-                    },
-                    "drop" => {
-                        self.btree.insert(temp_stack.clone(), Operations::Drop);
-                        temp_stack.clear()
-                    },
-                    _ => panic!("Error occurred: {}", e)
-                }
-            }
-        }
-
-        let vec_of_nums = self.btree.keys().flatten().cloned().collect::<Vec<Value>>() ;
-        let vec_of_operations = self.btree.values().cloned().collect::<Vec<_>>();
-
-
-        if vec_of_operations.is_empty() {
-            self.stack = temp_stack;
+        let mut input_split_on_whitespace = input.split_ascii_whitespace();
+        if input_split_on_whitespace.all(|x| x.parse::<Value>().is_ok()) {
+            self.stack = input.split_ascii_whitespace().map(|x| x.parse::<Value>().unwrap()).collect::<Vec<Value>>();
             return Ok(())
         }
 
-        let is_stack_manipulation = vec_of_operations
-            .iter()
+        let is_stack_manipulation = input_split_on_whitespace
             .any(|x| {
-                x == &Operations::Duplicate || x == &Operations::Drop || x == &Operations::Over || x == &Operations::Swap
+                STACK_MANIPULATION.contains(&x)
             });
 
-        if !is_stack_manipulation {
+        let vec_res = input.split_inclusive(INTEGER_ARITHMETIC).collect::<VecDeque<&str>>();
+        let first_value_vec_res = vec_res.front().unwrap().split_ascii_whitespace().collect::<Vec<_>>();
+        match first_value_vec_res.len() {
+            3 => {
+                let mut res = 0;
+                for val in vec_res{
+                    let mut split_whitespace_deque = val.split_ascii_whitespace().collect::<VecDeque<&str>>();
+                    let first_two_values_of_split_whitespace_deque= split_whitespace_deque
+                        .drain(0..=1)
+                        .map(|x| x.parse::<Value>().unwrap())
+                        .collect::<Vec<Value>>();
 
-            if vec_of_nums.len().saturating_sub(1) != (vec_of_operations.len()) {
-                return Err(StackUnderflow)
-            }
-
-            match Forth::calculate_integer_arithmetic(&self.btree) {
-                Ok(v) => {
-                    self.stack = v;
-                    Ok(())
-                },
-                Err(e) => Err(e)
-            }
-        } else {
-            if vec_of_nums.is_empty() || vec_of_operations.is_empty() {
-                return Err(Error::StackUnderflow)
-            }
-            match Forth::stack_manipulation(vec_of_nums, vec_of_operations.as_slice()) {
-                Ok(v) => {
-                    self.stack = v;
-                    Ok(())
-                },
-                Err(e) => Err(e)
-            }
+                    match split_whitespace_deque.pop_back() {
+                        Some("+") => {
+                            res += first_two_values_of_split_whitespace_deque.iter().sum::<Value>();
+                        },
+                        _ => panic!("Something went wrong")
+                    }
+                }
+                self.stack = vec![res];
+            },
+            _ => return Err(Error::StackUnderflow)
         }
+        Ok(())
     }
 }
