@@ -20,7 +20,6 @@ fn can_add_two_numbers() {
 }
 
 #[test]
-#[ignore]
 fn addition_error() {
     let mut f = Forth::new();
     assert_eq!(Err(Error::StackUnderflow), f.eval("1 +"));
