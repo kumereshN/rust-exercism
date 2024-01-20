@@ -103,11 +103,15 @@ impl Forth {
                         .drain(0..=1)
                         .map(|x| x.parse::<Value>().unwrap())
                         .collect::<Vec<Value>>();
+                    let (first_value, second_value) = (first_two_values_of_split_whitespace_deque.first().unwrap_or(&0), first_two_values_of_split_whitespace_deque.get(1).unwrap_or(&0));
 
                     match split_whitespace_deque.pop_back() {
                         Some("+") => {
                             res += first_two_values_of_split_whitespace_deque.iter().sum::<Value>();
                         },
+                        Some("-") => {
+                            res += first_value - second_value
+                        }
                         _ => panic!("Something went wrong")
                     }
                 }
