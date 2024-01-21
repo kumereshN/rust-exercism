@@ -96,7 +96,6 @@ fn multiplication_and_division() {
 }
 
 #[test]
-#[ignore]
 fn dup() {
     let mut f = Forth::new();
     assert!(f.eval("1 dup").is_ok());

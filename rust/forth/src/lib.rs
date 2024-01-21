@@ -42,62 +42,21 @@ impl Forth {
         &self.stack
     }
 
-    pub fn stack_manipulation(vec_of_nums: Vec<Value>, vec_of_ops: &[Operations]) -> std::result::Result<Vec<Value>, Error> {
-        let mut res = vec_of_nums.to_vec();
-        let last_digit = vec_of_nums.last().unwrap();
-        for ops in vec_of_ops {
-            match ops {
-                Operations::Duplicate => {
-                    res.push(*last_digit)
-                },
-                Operations::Drop => {
-                    res.pop();
-                }
-                _ => panic!("Invalid ops")
-            }
-        }
-        Ok(res)
+    pub fn stack_manipulation(&mut self, input: &str) -> std::result::Result<Vec<Value>, Error> {
+        let res = input
+            .split_at_mut()
+            .filter(|&x| x.parse::<Value>())
+            .collect::<Vec<_>>();
+        Ok(vec![1,2,3])
     }
 
-    pub fn calculate_integer_arithmetic(btree_value_ops: &BTreeMap<Vec<Value>, Operations>) -> std::result::Result<Vec<Value>, Error> {
-        let mut res = 0;
-
-        for (v, ops) in btree_value_ops {
-            match (ops, v.len()) {
-                (Operations::Add, _) => res += v.iter().sum::<Value>(),
-                (Operations::Subtract, 2) => res += v[0] - v[1],
-                (Operations::Subtract, _) => res -= v[0],
-                (Operations::Multiply, 2) => res += v[0] * v[1],
-                (Operations::Multiply, _) => res *= v[0],
-                (Operations::Divide, 2) => match v[0].checked_div_euclid(v[1]) {
-                    Some(v) => res += v,
-                    None => return Err(Error::DivisionByZero)
-                }
-                (Operations::Divide, _) => res /= v[0],
-                _ => panic!("Error occurred in operations")
-            }
-        }
-        Ok(vec![res])
-    }
-
-    pub fn eval(&mut self, input: &str) -> Result {
-        let mut input_split_on_whitespace = input.split_ascii_whitespace();
-        if input_split_on_whitespace.all(|x| x.parse::<Value>().is_ok()) {
-            self.stack = input.split_ascii_whitespace().map(|x| x.parse::<Value>().unwrap()).collect::<Vec<Value>>();
-            return Ok(())
-        }
-
-        let is_stack_manipulation = input_split_on_whitespace
-            .any(|x| {
-                STACK_MANIPULATION.contains(&x)
-            });
-
+    pub fn calculate_integer_arithmetic(&mut self, input: &str) -> Result {
         let vec_res = input.split_inclusive(INTEGER_ARITHMETIC).collect::<VecDeque<&str>>();
         let first_value_vec_res = vec_res.front().unwrap().split_ascii_whitespace().collect::<Vec<_>>();
         match first_value_vec_res.len() {
             3 => {
                 let mut res = 0;
-                for val in vec_res{
+                for val in vec_res {
                     let mut split_whitespace_deque = val.split_ascii_whitespace().collect::<VecDeque<&str>>();
                     let ops = split_whitespace_deque.pop_back();
                     let len_split_whitespace_deque = split_whitespace_deque.len();
@@ -136,8 +95,28 @@ impl Forth {
                     }
                 }
                 self.stack = vec![res];
+                Ok(())
             },
-            _ => return Err(Error::StackUnderflow)
+            _ => Err(Error::StackUnderflow)
+        }
+    }
+
+    pub fn eval(&mut self, input: &str) -> Result {
+        let mut input_split_on_whitespace = input.to_ascii_lowercase().split_ascii_whitespace();
+        if input_split_on_whitespace.all(|x| x.parse::<Value>().is_ok()) {
+            self.stack = input.split_ascii_whitespace().map(|x| x.parse::<Value>().unwrap()).collect::<Vec<Value>>();
+            return Ok(())
+        }
+
+        let is_stack_manipulation = input_split_on_whitespace
+            .any(|x| {
+                STACK_MANIPULATION.contains(&x)
+            });
+
+        if !is_stack_manipulation {
+            Forth::calculate_integer_arithmetic(self, input)?
+        } else {
+            return Ok(())
         }
         Ok(())
     }
