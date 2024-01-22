@@ -42,12 +42,29 @@ impl Forth {
         &self.stack
     }
 
-    pub fn stack_manipulation(&mut self, input: &str) -> std::result::Result<Vec<Value>, Error> {
-        let res = input
-            .split_at_mut()
-            .filter(|&x| x.parse::<Value>())
-            .collect::<Vec<_>>();
-        Ok(vec![1,2,3])
+    pub fn stack_manipulation(&mut self, input: &str) -> Result {
+
+        self.stack = input
+        .split_whitespace()
+        .fold(Vec::new(), |mut acc, x| {
+            match x.parse::<Value>() {
+                Ok(v) => {
+                    acc.push(v);
+                    acc
+                }
+                Err(e) => {
+                    match x {
+                        "dup" => {
+                            let last_value = acc.iter().last().unwrap();
+                            acc.push(*last_value);
+                            acc
+                        }
+                        _ => panic!("Invalid operation due to {}", e)
+                    }
+                }
+            }
+        });
+        Ok(())
     }
 
     pub fn calculate_integer_arithmetic(&mut self, input: &str) -> Result {
@@ -102,21 +119,23 @@ impl Forth {
     }
 
     pub fn eval(&mut self, input: &str) -> Result {
-        let mut input_split_on_whitespace = input.to_ascii_lowercase().split_ascii_whitespace();
-        if input_split_on_whitespace.all(|x| x.parse::<Value>().is_ok()) {
+        let lowercase_input = input.to_ascii_lowercase();
+        let input_split_on_whitespace = lowercase_input.as_str().split_whitespace().collect::<Vec<&str>>();
+        if input_split_on_whitespace.iter().all(|x| x.parse::<Value>().is_ok()) {
             self.stack = input.split_ascii_whitespace().map(|x| x.parse::<Value>().unwrap()).collect::<Vec<Value>>();
             return Ok(())
         }
 
         let is_stack_manipulation = input_split_on_whitespace
-            .any(|x| {
-                STACK_MANIPULATION.contains(&x)
+            .iter()
+            .any(|&x| {
+                x == "dup"
             });
 
         if !is_stack_manipulation {
             Forth::calculate_integer_arithmetic(self, input)?
         } else {
-            return Ok(())
+            Forth::stack_manipulation(self,input)?;
         }
         Ok(())
     }
