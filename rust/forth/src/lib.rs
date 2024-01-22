@@ -129,7 +129,7 @@ impl Forth {
         let is_stack_manipulation = input_split_on_whitespace
             .iter()
             .any(|&x| {
-                x == "dup"
+                STACK_MANIPULATION.contains(&x)
             });
 
         if !is_stack_manipulation {
