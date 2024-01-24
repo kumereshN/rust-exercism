@@ -42,11 +42,14 @@ impl Forth {
         &self.stack
     }
 
-    pub fn stack_manipulation(&mut self, input: &str) -> Result {
+    pub fn stack_manipulation(&mut self, input: Vec<&str>) -> Result {
+        if input.len() == 1 {
+            return Err(Error::StackUnderflow)
+        }
 
         self.stack = input
-        .split_whitespace()
-        .fold(Vec::new(), |mut acc, x| {
+        .iter()
+        .fold(Vec::new(), |mut acc, &x| {
             match x.parse::<Value>() {
                 Ok(v) => {
                     acc.push(v);
@@ -57,6 +60,10 @@ impl Forth {
                         "dup" => {
                             let last_value = acc.iter().last().unwrap();
                             acc.push(*last_value);
+                            acc
+                        }
+                        "drop" => {
+                            acc.pop();
                             acc
                         }
                         _ => panic!("Invalid operation due to {}", e)
@@ -135,7 +142,7 @@ impl Forth {
         if !is_stack_manipulation {
             Forth::calculate_integer_arithmetic(self, input)?
         } else {
-            Forth::stack_manipulation(self,input)?;
+            Forth::stack_manipulation(self, input_split_on_whitespace)?;
         }
         Ok(())
     }

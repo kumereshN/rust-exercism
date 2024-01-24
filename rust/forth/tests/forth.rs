@@ -117,14 +117,12 @@ fn dup_case_insensitive() {
 }
 
 #[test]
-#[ignore]
 fn dup_error() {
     let mut f = Forth::new();
     assert_eq!(Err(Error::StackUnderflow), f.eval("dup"));
 }
 
 #[test]
-#[ignore]
 fn drop() {
     let mut f = Forth::new();
     assert!(f.eval("1 drop").is_ok());
@@ -132,7 +130,6 @@ fn drop() {
 }
 
 #[test]
-#[ignore]
 fn drop_with_two() {
     let mut f = Forth::new();
     assert!(f.eval("1 2 drop").is_ok());
@@ -140,7 +137,6 @@ fn drop_with_two() {
 }
 
 #[test]
-#[ignore]
 fn drop_case_insensitive() {
     let mut f = Forth::new();
     assert!(f.eval("1 2 3 4 DROP Drop drop").is_ok());
@@ -148,7 +144,6 @@ fn drop_case_insensitive() {
 }
 
 #[test]
-#[ignore]
 fn drop_error() {
     let mut f = Forth::new();
     assert_eq!(Err(Error::StackUnderflow), f.eval("drop"));
