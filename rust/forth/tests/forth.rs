@@ -150,7 +150,6 @@ fn drop_error() {
 }
 
 #[test]
-#[ignore]
 fn swap() {
     let mut f = Forth::new();
     assert!(f.eval("1 2 swap").is_ok());
@@ -158,7 +157,6 @@ fn swap() {
 }
 
 #[test]
-#[ignore]
 fn swap_with_three() {
     let mut f = Forth::new();
     assert!(f.eval("1 2 3 swap").is_ok());
@@ -166,7 +164,6 @@ fn swap_with_three() {
 }
 
 #[test]
-#[ignore]
 fn swap_case_insensitive() {
     let mut f = Forth::new();
     assert!(f.eval("1 2 SWAP 3 Swap 4 swap").is_ok());
@@ -174,7 +171,6 @@ fn swap_case_insensitive() {
 }
 
 #[test]
-#[ignore]
 fn swap_error() {
     let mut f = Forth::new();
     assert_eq!(Err(Error::StackUnderflow), f.eval("1 swap"));

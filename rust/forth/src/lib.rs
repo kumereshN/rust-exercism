@@ -42,35 +42,44 @@ impl Forth {
         &self.stack
     }
 
-    pub fn stack_manipulation(&mut self, input: Vec<&str>) -> Result {
+    pub fn stack_manipulation(&mut self, input: VecDeque<&str>) -> Result {
         if input.len() == 1 {
             return Err(Error::StackUnderflow)
         }
 
-        self.stack = input
+        let res =
+                input
         .iter()
-        .fold(Vec::new(), |mut acc, &x| {
+        .try_fold(Vec::new(), |mut acc, &x| {
             match x.parse::<Value>() {
                 Ok(v) => {
                     acc.push(v);
-                    acc
+                    Ok(acc)
                 }
-                Err(e) => {
+                Err(_) => {
                     match x {
                         "dup" => {
                             let last_value = acc.iter().last().unwrap();
                             acc.push(*last_value);
-                            acc
-                        }
+                            Ok(acc)
+                        },
                         "drop" => {
                             acc.pop();
-                            acc
+                            Ok(acc)
+                        },
+                        "swap" if acc.len() > 1 => {
+                            let first_value = acc.pop().unwrap();
+                            let second_value = acc.pop().unwrap();
+                            acc.push(first_value);
+                            acc.push(second_value);
+                            Ok(acc)
                         }
-                        _ => panic!("Invalid operation due to {}", e)
+                        _ => Err(Error::StackUnderflow)
                     }
                 }
             }
         });
+        self.stack = res?;
         Ok(())
     }
 
@@ -127,7 +136,7 @@ impl Forth {
 
     pub fn eval(&mut self, input: &str) -> Result {
         let lowercase_input = input.to_ascii_lowercase();
-        let input_split_on_whitespace = lowercase_input.as_str().split_whitespace().collect::<Vec<&str>>();
+        let input_split_on_whitespace = lowercase_input.as_str().split_whitespace().collect::<VecDeque<&str>>();
         if input_split_on_whitespace.iter().all(|x| x.parse::<Value>().is_ok()) {
             self.stack = input.split_ascii_whitespace().map(|x| x.parse::<Value>().unwrap()).collect::<Vec<Value>>();
             return Ok(())
