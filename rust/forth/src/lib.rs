@@ -4,7 +4,7 @@ pub type Value = i32;
 pub type Result = std::result::Result<(), Error>;
 pub struct Forth {
     stack: Vec<Value>,
-    btree: BTreeMap<Vec<Value>, Operations>
+    btree: BTreeMap<String, VecDeque<String>>
 }
 
 #[derive(Debug, PartialEq, Eq)]
@@ -13,18 +13,6 @@ pub enum Error {
     StackUnderflow,
     UnknownWord,
     InvalidWord,
-}
-
-#[derive(Debug, PartialEq, Eq, Clone)]
-pub enum Operations {
-    Add,
-    Subtract,
-    Multiply,
-    Divide,
-    Duplicate,
-    Drop,
-    Swap,
-    Over
 }
 
 const INTEGER_ARITHMETIC: [char; 4] = ['+', '-', '*', '/'];
@@ -42,7 +30,7 @@ impl Forth {
         &self.stack
     }
 
-    pub fn stack_manipulation(&mut self, input: VecDeque<&str>) -> Result {
+    pub fn stack_manipulation(&mut self, input: VecDeque<String>) -> Result {
         if input.len() == 1 {
             return Err(Error::StackUnderflow)
         }
@@ -50,14 +38,14 @@ impl Forth {
         let res =
                 input
         .iter()
-        .try_fold(Vec::new(), |mut acc, &x| {
+        .try_fold(Vec::new(), |mut acc, x| {
             match x.parse::<Value>() {
                 Ok(v) => {
                     acc.push(v);
                     Ok(acc)
                 }
                 Err(_) => {
-                    match x {
+                    match x.as_str() {
                         "dup" => {
                             let last_value = acc.iter().last().unwrap();
                             acc.push(*last_value);
@@ -140,9 +128,16 @@ impl Forth {
         }
     }
 
+    pub fn user_defined_words(&mut self, mut input: VecDeque<String>) -> Result {
+        let key_word = input.pop_front().unwrap();
+        self.btree = BTreeMap::from([
+            (key_word, input)
+        ]);
+        Ok(())
+    }
+
     pub fn eval(&mut self, input: &str) -> Result {
-        let lowercase_input = input.to_ascii_lowercase();
-        let input_split_on_whitespace = lowercase_input.as_str().split_whitespace().collect::<VecDeque<&str>>();
+        let mut input_split_on_whitespace = input.split_whitespace().map(|c| c.to_lowercase()).collect::<VecDeque<String>>();
         if input_split_on_whitespace.iter().all(|x| x.parse::<Value>().is_ok()) {
             self.stack = input.split_ascii_whitespace().map(|x| x.parse::<Value>().unwrap()).collect::<Vec<Value>>();
             return Ok(())
@@ -150,12 +145,18 @@ impl Forth {
 
         let is_stack_manipulation = input_split_on_whitespace
             .iter()
-            .any(|&x| {
-                STACK_MANIPULATION.contains(&x)
+            .any(|x| {
+                STACK_MANIPULATION.contains(&&**x)
             });
+
+        let is_user_defined_words = (*input_split_on_whitespace.front().unwrap() == ":") && (*input_split_on_whitespace.back().unwrap() == ";");
 
         if !is_stack_manipulation {
             Forth::calculate_integer_arithmetic(self, input)?
+        } else if is_user_defined_words {
+            input_split_on_whitespace.pop_front();
+            input_split_on_whitespace.pop_back();
+            Forth::user_defined_words(self, input_split_on_whitespace)?
         } else {
             Forth::stack_manipulation(self, input_split_on_whitespace)?;
         }
