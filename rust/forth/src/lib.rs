@@ -146,14 +146,16 @@ impl Forth {
         let is_stack_manipulation = input_split_on_whitespace
             .iter()
             .any(|x| {
-                STACK_MANIPULATION.contains(&&**x)
+                STACK_MANIPULATION.contains(&x.as_str())
             });
 
         let is_user_defined_words = (*input_split_on_whitespace.front().unwrap() == ":") && (*input_split_on_whitespace.back().unwrap() == ";");
 
         if !self.btree.is_empty() {
-            self.stack = vec![1,1,1];
-            return Ok(())
+            let (key, value) = self.btree.first_key_value().unwrap();
+            let v = value.iter().map(|x| x.as_str()).collect::<Vec<_>>().join(" ");
+            let replacement_string = input.replace(key.as_str(), v.as_str());
+            Forth::eval(self, replacement_string.as_str())?
         }
 
         if !is_stack_manipulation {
@@ -163,7 +165,7 @@ impl Forth {
             input_split_on_whitespace.pop_back();
             Forth::user_defined_words(self, input_split_on_whitespace)?
         } else {
-            Forth::stack_manipulation(self, input_split_on_whitespace)?;
+            Forth::stack_manipulation(self, input_split_on_whitespace)?
         }
         Ok(())
     }
