@@ -178,7 +178,6 @@ fn swap_error() {
 }
 
 #[test]
-#[ignore]
 fn over() {
     let mut f = Forth::new();
     assert!(f.eval("1 2 over").is_ok());
@@ -186,7 +185,6 @@ fn over() {
 }
 
 #[test]
-#[ignore]
 fn over_with_three() {
     let mut f = Forth::new();
     assert!(f.eval("1 2 3 over").is_ok());
@@ -194,7 +192,6 @@ fn over_with_three() {
 }
 
 #[test]
-#[ignore]
 fn over_case_insensitive() {
     let mut f = Forth::new();
     assert!(f.eval("1 2 OVER Over over").is_ok());
@@ -202,7 +199,6 @@ fn over_case_insensitive() {
 }
 
 #[test]
-#[ignore]
 fn over_error() {
     let mut f = Forth::new();
     assert_eq!(Err(Error::StackUnderflow), f.eval("1 over"));

@@ -73,6 +73,12 @@ impl Forth {
                             acc.push(first_value);
                             acc.push(second_value);
                             Ok(acc)
+                        },
+                        "over" if acc.len() > 1 => {
+                            let idx = acc.len() - 2;
+                            let no_to_push = acc.get(idx).unwrap();
+                            acc.push(*no_to_push);
+                            Ok(acc)
                         }
                         _ => Err(Error::StackUnderflow)
                     }
