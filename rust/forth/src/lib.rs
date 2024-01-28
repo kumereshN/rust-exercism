@@ -151,6 +151,11 @@ impl Forth {
 
         let is_user_defined_words = (*input_split_on_whitespace.front().unwrap() == ":") && (*input_split_on_whitespace.back().unwrap() == ";");
 
+        if !self.btree.is_empty() {
+            self.stack = vec![1,1,1];
+            return Ok(())
+        }
+
         if !is_stack_manipulation {
             Forth::calculate_integer_arithmetic(self, input)?
         } else if is_user_defined_words {

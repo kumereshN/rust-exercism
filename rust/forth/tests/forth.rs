@@ -208,7 +208,6 @@ fn over_error() {
 // User-defined words
 
 #[test]
-#[ignore]
 fn can_consist_of_built_in_words() {
     let mut f = Forth::new();
     assert!(f.eval(": dup-twice dup dup ;").is_ok());
