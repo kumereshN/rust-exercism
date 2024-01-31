@@ -74,6 +74,7 @@ impl Forth {
             }
         });
         self.stack = res?;
+        println!("stack is {:?}", self.stack);
         Ok(())
     }
 
@@ -155,7 +156,8 @@ impl Forth {
             let (key, value) = self.btree.first_key_value().unwrap();
             let v = value.iter().map(|x| x.as_str()).collect::<Vec<_>>().join(" ");
             let replacement_string = input.replace(key.as_str(), v.as_str());
-            Forth::eval(self, replacement_string.as_str())?
+            Forth::stack_manipulation(self, replacement_string.split_ascii_whitespace().map(|x| x.to_string()).collect::<VecDeque<String>>())?;
+            return Ok(())
         }
 
         if !is_stack_manipulation {
