@@ -139,18 +139,14 @@ impl Forth {
 
     pub fn eval(&mut self, input: &str) -> Result {
         let mut input_split_on_whitespace = input.split_whitespace().map(|c| c.to_lowercase()).collect::<VecDeque<String>>();
-        if input_split_on_whitespace.iter().all(|x| x.parse::<Value>().is_ok()) {
-            self.stack = input.split_ascii_whitespace().map(|x| x.parse::<Value>().unwrap()).collect::<Vec<Value>>();
+        let is_user_defined_words = (input_split_on_whitespace.contains(&":".to_string())) && (input_split_on_whitespace.contains(&";".to_string()));
+
+        if is_user_defined_words {
+            input_split_on_whitespace.pop_front();
+            input_split_on_whitespace.pop_back();
+            Forth::user_defined_words(self, input_split_on_whitespace)?;
             return Ok(())
         }
-
-        let is_stack_manipulation = input_split_on_whitespace
-            .iter()
-            .any(|x| {
-                STACK_MANIPULATION.contains(&x.as_str())
-            });
-
-        let is_user_defined_words = (*input_split_on_whitespace.front().unwrap() == ":") && (*input_split_on_whitespace.back().unwrap() == ";");
 
         if !self.btree.is_empty() {
             let (key, value) = self.btree.first_key_value().unwrap();
@@ -160,12 +156,19 @@ impl Forth {
             return Ok(())
         }
 
+        let is_stack_manipulation = input_split_on_whitespace
+            .iter()
+            .any(|x| {
+                STACK_MANIPULATION.contains(&x.as_str())
+            });
+
+        if input_split_on_whitespace.iter().all(|x| x.parse::<Value>().is_ok()) {
+            self.stack = input.split_ascii_whitespace().map(|x| x.parse::<Value>().unwrap()).collect::<Vec<Value>>();
+            return Ok(())
+        }
+
         if !is_stack_manipulation {
             Forth::calculate_integer_arithmetic(self, input)?
-        } else if is_user_defined_words {
-            input_split_on_whitespace.pop_front();
-            input_split_on_whitespace.pop_back();
-            Forth::user_defined_words(self, input_split_on_whitespace)?
         } else {
             Forth::stack_manipulation(self, input_split_on_whitespace)?
         }
