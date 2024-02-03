@@ -216,7 +216,6 @@ fn can_consist_of_built_in_words() {
 }
 
 #[test]
-#[ignore]
 fn execute_in_the_right_order() {
     let mut f = Forth::new();
     assert!(f.eval(": countup 1 2 3 ;").is_ok());
@@ -225,7 +224,6 @@ fn execute_in_the_right_order() {
 }
 
 #[test]
-#[ignore]
 fn redefining_an_existing_word() {
     let mut f = Forth::new();
     assert!(f.eval(": foo dup ;").is_ok());

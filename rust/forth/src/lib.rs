@@ -4,7 +4,8 @@ pub type Value = i32;
 pub type Result = std::result::Result<(), Error>;
 pub struct Forth {
     stack: Vec<Value>,
-    btree: BTreeMap<String, VecDeque<String>>
+    btree: BTreeMap<String, VecDeque<String>>,
+    has_user_defined_words: bool
 }
 
 #[derive(Debug, PartialEq, Eq)]
@@ -22,7 +23,8 @@ impl Forth {
     pub fn new() -> Forth {
         Forth {
             stack: vec![],
-            btree: BTreeMap::new()
+            btree: BTreeMap::new(),
+            has_user_defined_words: false
         }
     }
 
@@ -144,15 +146,17 @@ impl Forth {
         if is_user_defined_words {
             input_split_on_whitespace.pop_front();
             input_split_on_whitespace.pop_back();
+            self.has_user_defined_words = true;
             Forth::user_defined_words(self, input_split_on_whitespace)?;
             return Ok(())
         }
 
-        if !self.btree.is_empty() {
+        if self.has_user_defined_words {
             let (key, value) = self.btree.first_key_value().unwrap();
             let v = value.iter().map(|x| x.as_str()).collect::<Vec<_>>().join(" ");
             let replacement_string = input.replace(key.as_str(), v.as_str());
-            Forth::stack_manipulation(self, replacement_string.split_ascii_whitespace().map(|x| x.to_string()).collect::<VecDeque<String>>())?;
+            self.has_user_defined_words = false;
+            Forth::eval(self, replacement_string.as_str())?;
             return Ok(())
         }
 
