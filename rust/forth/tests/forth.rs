@@ -233,7 +233,6 @@ fn redefining_an_existing_word() {
 }
 
 #[test]
-#[ignore]
 fn redefining_an_existing_built_in_word() {
     let mut f = Forth::new();
     assert!(f.eval(": swap dup ;").is_ok());
@@ -242,7 +241,6 @@ fn redefining_an_existing_built_in_word() {
 }
 
 #[test]
-#[ignore]
 fn user_defined_words_are_case_insensitive() {
     let mut f = Forth::new();
     assert!(f.eval(": foo dup ;").is_ok());
