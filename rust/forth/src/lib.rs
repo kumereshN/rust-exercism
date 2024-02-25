@@ -76,7 +76,6 @@ impl Forth {
             }
         });
         self.stack = res?;
-        println!("stack is {:?}", self.stack);
         Ok(())
     }
 
@@ -152,14 +151,17 @@ impl Forth {
         }
 
         if self.has_user_defined_words {
-            let (key, value) = self.btree.first_key_value().unwrap();
-            let v = value.iter().map(|x| x.as_str()).collect::<Vec<_>>().join(" ");
-            let lowercase_input = input_split_on_whitespace.into_iter().collect::<Vec<String>>().join(" ");
-            let replacement_string = lowercase_input.replace(key.as_str(), v.as_str());
-            self.has_user_defined_words = false;
-            Forth::eval(self, replacement_string.as_str())?;
+            for (key, value) in self.btree.clone() {
+                let v = value.iter().map(|x| x.as_str()).collect::<Vec<_>>().join(" ");
+                let lowercase_input = input_split_on_whitespace.clone().into_iter().collect::<Vec<String>>().join(" ");
+                let replacement_string = lowercase_input.replace(key.as_str(), v.as_str());
+                self.has_user_defined_words = false;
+                Forth::eval(self, replacement_string.as_str())?;
+            }
             return Ok(())
         }
+
+        println!("Stack is {:?}", self.stack());
 
         let is_stack_manipulation = input_split_on_whitespace
             .iter()
