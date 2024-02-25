@@ -151,7 +151,7 @@ impl Forth {
         }
 
         if self.has_user_defined_words {
-            for (key, value) in self.btree.clone() {
+            for (key, value) in self.btree {
                 let v = value.iter().map(|x| x.as_str()).collect::<Vec<_>>().join(" ");
                 let lowercase_input = input_split_on_whitespace.clone().into_iter().collect::<Vec<String>>().join(" ");
                 let replacement_string = lowercase_input.replace(key.as_str(), v.as_str());
