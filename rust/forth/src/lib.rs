@@ -1,12 +1,15 @@
-use std::collections::{BTreeMap, VecDeque};
+use std::collections::{HashMap};
 
 pub type Value = i32;
-pub type Result = std::result::Result<(), Error>;
+pub type ForthResult = std::result::Result<(), Error>;
+#[derive(Default, Debug, PartialEq, Eq)]
 pub struct Forth {
     stack: Vec<Value>,
-    btree: BTreeMap<String, VecDeque<String>>,
-    has_user_defined_words: bool
+    words: HashMap<String, Id>,
+    definitions: Vec<Vec<Op>>
 }
+
+type Id = u16;
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum Error {
@@ -16,169 +19,143 @@ pub enum Error {
     InvalidWord,
 }
 
-const INTEGER_ARITHMETIC: [char; 4] = ['+', '-', '*', '/'];
-const STACK_MANIPULATION: [&str; 4] = ["dup", "drop", "swap", "over"];
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum Op {
+    Add,
+    Sub,
+    Mul,
+    Div,
+    Dup,
+    Drop,
+    Swap,
+    Over,
+    Push(Value),
+    Call(Id),
+}
+
+#[derive(Debug, PartialEq, Eq)]
+enum Mode {
+    Run,
+    Word,
+    Define(String, Vec<Op>)
+}
 
 impl Forth {
     pub fn new() -> Forth {
-        Forth {
-            stack: vec![],
-            btree: BTreeMap::new(),
-            has_user_defined_words: false
-        }
+        Self::default()
     }
 
     pub fn stack(&self) -> &[Value] {
         &self.stack
     }
 
-    pub fn stack_manipulation(&mut self, input: VecDeque<String>) -> Result {
-        if input.len() == 1 {
-            return Err(Error::StackUnderflow)
-        }
+    pub fn eval(&mut self, input: &str) -> ForthResult {
+        let mut mode = Mode::Run;
 
-        let res =
-                input
-        .iter()
-        .try_fold(Vec::new(), |mut acc, x| {
-            match x.parse::<Value>() {
-                Ok(v) => {
-                    acc.push(v);
-                    Ok(acc)
+        for token in input.to_uppercase().split_whitespace() {
+            match mode {
+                Mode::Run => {
+                    if token == ":" {
+                        mode = Mode::Word;
+                    } else {
+                        eval_op(
+                            parse_op(token, &self.words)?,
+                            &mut self.stack,
+                            &self.definitions,
+                        )?;
+                    }
                 }
-                Err(_) => {
-                    match x.as_str() {
-                        "dup" => {
-                            let last_value = acc.iter().last().unwrap();
-                            acc.push(*last_value);
-                            Ok(acc)
-                        },
-                        "drop" => {
-                            acc.pop();
-                            Ok(acc)
-                        },
-                        "swap" if acc.len() > 1 => {
-                            let first_value = acc.pop().unwrap();
-                            let second_value = acc.pop().unwrap();
-                            acc.push(first_value);
-                            acc.push(second_value);
-                            Ok(acc)
-                        },
-                        "over" if acc.len() > 1 => {
-                            let idx = acc.len() - 2;
-                            let no_to_push = acc.get(idx).unwrap();
-                            acc.push(*no_to_push);
-                            Ok(acc)
+                Mode::Word => {
+                    // It must be a word not a number
+                    if token.parse::<Value>().is_ok() {
+                        return Err(Error::InvalidWord);
+                    }
+                    mode = Mode::Define(token.into(), Vec::new());
+                }
+                Mode::Define(_, ref mut definition) => {
+                    // Reach the end of defined words
+                    if token == ";" {
+                        if let Mode::Define(word, definition) =
+                            std::mem::replace(&mut mode, Mode::Run) {
+                            self.definitions.push(definition);
+                            self.words.insert(word, self.definitions.len() as Id - 1);
                         }
-                        _ => Err(Error::StackUnderflow)
+                    } else {
+                        // If there are more words or numbers to be defined
+                        definition.push(parse_op(token, &self.words)?);
                     }
                 }
             }
-        });
-        self.stack = res?;
-        Ok(())
-    }
-
-    pub fn calculate_integer_arithmetic(&mut self, input: &str) -> Result {
-        let vec_res = input.split_inclusive(INTEGER_ARITHMETIC).collect::<VecDeque<&str>>();
-        let first_value_vec_res = vec_res.front().unwrap().split_ascii_whitespace().collect::<Vec<_>>();
-        match first_value_vec_res.len() {
-            3 => {
-                let mut res = 0;
-                for val in vec_res {
-                    let mut split_whitespace_deque = val.split_ascii_whitespace().collect::<VecDeque<&str>>();
-                    let ops = split_whitespace_deque.pop_back();
-                    let len_split_whitespace_deque = split_whitespace_deque.len();
-                    let split_whitespace_deque_parsed = split_whitespace_deque
-                        .iter()
-                        .map(|x| x.parse::<Value>().unwrap())
-                        .collect::<Vec<Value>>();
-                    let (first_value, second_value) = (split_whitespace_deque_parsed[0], split_whitespace_deque_parsed.get(1).unwrap_or(&-1));
-
-                    match (ops, len_split_whitespace_deque) {
-                        (Some("+"), _) => {
-                            res += split_whitespace_deque_parsed.iter().sum::<Value>();
-                        },
-                        (Some("-"), 2) => {
-                            res += first_value - second_value
-                        },
-                        (Some("-"), _) => {
-                            res -= first_value
-                        }
-                        (Some("*"), 2) => {
-                            res += first_value * second_value
-                        },
-                        (Some("*"), _) => {
-                            res *= first_value
-                        },
-                        (Some("/"), 2) => {
-                            res += match first_value.checked_div_euclid(*second_value) {
-                                Some(v) => v,
-                                None => return Err(Error::DivisionByZero)
-                            }
-                        },
-                        (Some("/"), _) => {
-                            res /= first_value
-                        }
-                        _ => panic!("Something went wrong")
-                    }
-                }
-                self.stack = vec![res];
-                Ok(())
-            },
-            _ => Err(Error::StackUnderflow)
-        }
-    }
-
-    pub fn user_defined_words(&mut self, mut input: VecDeque<String>) -> Result {
-        let key_word = input.pop_front().unwrap();
-        self.btree = BTreeMap::from([
-            (key_word, input)
-        ]);
-        Ok(())
-    }
-
-    pub fn eval(&mut self, input: &str) -> Result {
-        let mut input_split_on_whitespace = input.split_whitespace().map(|c| c.to_lowercase()).collect::<VecDeque<String>>();
-        let is_user_defined_words = (input_split_on_whitespace.contains(&":".to_string())) && (input_split_on_whitespace.contains(&";".to_string()));
-
-        if is_user_defined_words {
-            input_split_on_whitespace.pop_front();
-            input_split_on_whitespace.pop_back();
-            self.has_user_defined_words = true;
-            Forth::user_defined_words(self, input_split_on_whitespace)?;
-            return Ok(())
         }
 
-        if self.has_user_defined_words {
-            for (key, value) in self.btree {
-                let v = value.iter().map(|x| x.as_str()).collect::<Vec<_>>().join(" ");
-                let lowercase_input = input_split_on_whitespace.clone().into_iter().collect::<Vec<String>>().join(" ");
-                let replacement_string = lowercase_input.replace(key.as_str(), v.as_str());
-                self.has_user_defined_words = false;
-                Forth::eval(self, replacement_string.as_str())?;
-            }
-            return Ok(())
-        }
-
-        println!("Stack is {:?}", self.stack());
-
-        let is_stack_manipulation = input_split_on_whitespace
-            .iter()
-            .any(|x| {
-                STACK_MANIPULATION.contains(&x.as_str())
-            });
-
-        if input_split_on_whitespace.iter().all(|x| x.parse::<Value>().is_ok()) {
-            self.stack = input.split_ascii_whitespace().map(|x| x.parse::<Value>().unwrap()).collect::<Vec<Value>>();
-            return Ok(())
-        }
-
-        if !is_stack_manipulation {
-            Forth::calculate_integer_arithmetic(self, input)?
-        } else {
-            Forth::stack_manipulation(self, input_split_on_whitespace)?
-        }
-        Ok(())
+        (mode == Mode::Run).then_some(()).ok_or(Error::InvalidWord)
     }
 }
+
+fn parse_op(token: &str, words: &HashMap<String, Id>) -> Result<Op, Error> {
+    Ok(if let Some(id) = words.get(token) {
+        Op::Call(*id)
+    } else {
+        match token {
+            "+" => Op::Add,
+            "-" => Op::Sub,
+            "*" => Op::Mul,
+            "/" => Op::Div,
+            "DUP" => Op::Dup,
+            "DROP" => Op::Drop,
+            "SWAP" => Op::Swap,
+            "OVER" => Op::Over,
+            _ => Op::Push(token.parse::<Value>().map_err(|_| Error::UnknownWord)?),
+        }
+    })
+}
+
+fn eval_op(op: Op, stack: &mut Vec<Value>, definitions: &Vec<Vec<Op>>) -> ForthResult {
+    let mut pop = || stack.pop().ok_or(Error::StackUnderflow);
+    match op {
+        Op::Add => {
+            let (rhs, lhs) = (pop()?, pop()?);
+            stack.push(lhs + rhs);
+        },
+        Op::Sub => {
+            let (rhs, lhs) = (pop()?, pop()?);
+            stack.push(lhs - rhs);
+        },
+        Op::Mul => {
+            let (rhs, lhs) = (pop()?, pop()?);
+            stack.push(lhs * rhs);
+        },
+        Op::Div => {
+            let (rhs, lhs) = (pop()?, pop()?);
+            let quotient = lhs.checked_div(rhs).ok_or(Error::DivisionByZero)?;
+            stack.push(quotient);
+        },
+        Op::Dup => {
+            let first = *stack.last().ok_or(Error::StackUnderflow)?;
+            stack.push(first);
+        }
+        Op::Drop => {
+            pop()?;
+        },
+        Op::Swap => {
+            let (first, second) = (pop()?, pop()?);
+            stack.push(first);
+            stack.push(second);
+        },
+        Op::Over => {
+            let below = *stack.iter().nth_back(1).ok_or(Error::StackUnderflow)?;
+            stack.push(below);
+        },
+        Op::Push(num) => {
+            stack.push(num);
+        },
+        Op::Call(id) => {
+            for op in &definitions[id as usize] {
+                eval_op(*op, stack, definitions)?;
+            }
+        }
+    }
+    Ok(())
+}
+
+
