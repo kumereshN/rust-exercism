@@ -78,6 +78,8 @@ impl Forth {
                         if let Mode::Define(word, definition) =
                             std::mem::replace(&mut mode, Mode::Run) {
                             self.definitions.push(definition);
+                            // self.definitions.len() as Id - 1 is the id of a vec
+                            // This is used to iterate over the vec<Ops>
                             self.words.insert(word, self.definitions.len() as Id - 1);
                         }
                     } else {
