@@ -1,17 +1,25 @@
-use std::collections::{HashMap};
-
+use std::collections::HashMap;
 pub type Value = i32;
-pub type ForthResult = std::result::Result<(), Error>;
-#[derive(Default, Debug, PartialEq, Eq)]
+pub type Result = std::result::Result<(), Error>;
+
+const ADD: &str = "+";
+const SUBTRACT: &str = "-";
+const MULTIPLY: &str = "*";
+const DIVIDE: &str = "/";
+const DROP: &str = "drop";
+const DUP: &str = "dup";
+const SWAP: &str = "swap";
+const OVER: &str = "over";
+const WORD_DEF_START: &str = ":";
+const WORD_DEF_END: &str = ";";
+
+#[derive(Debug, Default)]
 pub struct Forth {
     stack: Vec<Value>,
-    words: HashMap<String, Id>,
-    definitions: Vec<Vec<Op>>
+    words: HashMap<String, String>,
 }
 
-type Id = u16;
-
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq)]
 pub enum Error {
     DivisionByZero,
     StackUnderflow,
@@ -19,145 +27,146 @@ pub enum Error {
     InvalidWord,
 }
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-enum Op {
-    Add,
-    Sub,
-    Mul,
-    Div,
-    Dup,
-    Drop,
-    Swap,
-    Over,
-    Push(Value),
-    Call(Id),
-}
-
-#[derive(Debug, PartialEq, Eq)]
-enum Mode {
-    Run,
-    Word,
-    Define(String, Vec<Op>)
-}
-
 impl Forth {
     pub fn new() -> Forth {
-        Self::default()
+        Default::default()
     }
 
     pub fn stack(&self) -> &[Value] {
         &self.stack
     }
 
-    pub fn eval(&mut self, input: &str) -> ForthResult {
-        let mut mode = Mode::Run;
+    pub fn eval(&mut self, input: &str) -> Result {
+        let mut is_adding_word: bool = false;
+        let mut new_word = String::new();
+        let mut word_definition = String::new();
 
-        for token in input.to_uppercase().split_whitespace() {
-            match mode {
-                Mode::Run => {
-                    if token == ":" {
-                        mode = Mode::Word;
-                    } else {
-                        eval_op(
-                            parse_op(token, &self.words)?,
-                            &mut self.stack,
-                            &self.definitions,
-                        )?;
+        for entry in input.split_whitespace() {
+            let entry_lowercase = &entry.clone().to_lowercase()[..];
+            match entry_lowercase {
+                WORD_DEF_START if !is_adding_word => {
+                    is_adding_word = true;
+                    new_word = String::new();
+                    word_definition = String::new();
+                }
+
+                WORD_DEF_END if is_adding_word => {
+                    is_adding_word = false;
+                    //if the 'new word' already exists, check the definitions of other words in the dictionary
+                    //and expand any occurance of the 'new word' with it's old definition.
+                    if let Some(old_definition) =
+                        self.words.insert(new_word.clone(), word_definition.clone())
+                    {
+                        self.replace(&new_word, &old_definition);
                     }
                 }
-                Mode::Word => {
-                    // It must be a word not a number
-                    if token.parse::<Value>().is_ok() {
-                        return Err(Error::InvalidWord);
-                    }
-                    mode = Mode::Define(token.into(), Vec::new());
+
+                e if is_adding_word && new_word.is_empty() && e.parse::<i32>().is_ok() => {
+                    return Err(Error::InvalidWord)
                 }
-                Mode::Define(_, ref mut definition) => {
-                    // Reach the end of defined words
-                    if token == ";" {
-                        if let Mode::Define(word, definition) =
-                            std::mem::replace(&mut mode, Mode::Run) {
-                            self.definitions.push(definition);
-                            // self.definitions.len() as Id - 1 is the id of a vec
-                            // This is used to iterate over the vec<Ops>
-                            self.words.insert(word, self.definitions.len() as Id - 1);
-                        }
-                    } else {
-                        // If there are more words or numbers to be defined
-                        definition.push(parse_op(token, &self.words)?);
-                    }
+
+                e if is_adding_word && new_word.is_empty() => new_word = e.into(),
+                e if is_adding_word => word_definition = format!("{} {}", word_definition, e),
+                e if self.words.contains_key(e) => {
+                    let input = self.words.get(e).unwrap().to_owned();
+                    self.eval(&input)?
                 }
+                e if e.parse::<Value>().is_ok() => self.stack.push(e.parse::<Value>().unwrap()),
+                ADD | SUBTRACT | MULTIPLY | DIVIDE => self.do_arithmetic(entry_lowercase)?,
+                DROP | DUP | SWAP | OVER => self.do_stack_op(entry_lowercase)?,
+                _ => return Err(Error::UnknownWord),
             }
         }
 
-        (mode == Mode::Run).then_some(()).ok_or(Error::InvalidWord)
+        match is_adding_word {
+            true => Err(Error::InvalidWord),
+            false => Ok(()),
+        }
     }
-}
 
-fn parse_op(token: &str, words: &HashMap<String, Id>) -> Result<Op, Error> {
-    Ok(if let Some(id) = words.get(token) {
-        Op::Call(*id)
-    } else {
-        match token {
-            "+" => Op::Add,
-            "-" => Op::Sub,
-            "*" => Op::Mul,
-            "/" => Op::Div,
-            "DUP" => Op::Dup,
-            "DROP" => Op::Drop,
-            "SWAP" => Op::Swap,
-            "OVER" => Op::Over,
-            _ => Op::Push(token.parse::<Value>().map_err(|_| Error::UnknownWord)?),
-        }
-    })
-}
+    fn do_arithmetic(&mut self, operator: &str) -> Result {
+        let rhs = self.stack.pop();
+        let lhs = self.stack.pop();
 
-fn eval_op(op: Op, stack: &mut Vec<Value>, definitions: &Vec<Vec<Op>>) -> ForthResult {
-    let mut pop = || stack.pop().ok_or(Error::StackUnderflow);
-    match op {
-        Op::Add => {
-            let (rhs, lhs) = (pop()?, pop()?);
-            stack.push(lhs + rhs);
-        },
-        Op::Sub => {
-            let (rhs, lhs) = (pop()?, pop()?);
-            stack.push(lhs - rhs);
-        },
-        Op::Mul => {
-            let (rhs, lhs) = (pop()?, pop()?);
-            stack.push(lhs * rhs);
-        },
-        Op::Div => {
-            let (rhs, lhs) = (pop()?, pop()?);
-            let quotient = lhs.checked_div(rhs).ok_or(Error::DivisionByZero)?;
-            stack.push(quotient);
-        },
-        Op::Dup => {
-            let first = *stack.last().ok_or(Error::StackUnderflow)?;
-            stack.push(first);
+        let (lhs, rhs) = match (lhs, rhs) {
+            (None, _) => return Err(Error::StackUnderflow),
+            (_, None) => return Err(Error::StackUnderflow),
+            (_, Some(0)) if operator == DIVIDE => return Err(Error::DivisionByZero),
+            (Some(lhs), Some(rhs)) => (lhs, rhs),
+        };
+
+        match operator {
+            ADD => self.stack.push(lhs + rhs),
+            SUBTRACT => self.stack.push(lhs - rhs),
+            MULTIPLY => self.stack.push(lhs * rhs),
+            DIVIDE => self.stack.push(lhs / rhs),
+            _ => return Err(Error::InvalidWord),
         }
-        Op::Drop => {
-            pop()?;
-        },
-        Op::Swap => {
-            let (first, second) = (pop()?, pop()?);
-            stack.push(first);
-            stack.push(second);
-        },
-        Op::Over => {
-            let below = *stack.iter().nth_back(1).ok_or(Error::StackUnderflow)?;
-            stack.push(below);
-        },
-        Op::Push(num) => {
-            stack.push(num);
-        },
-        Op::Call(id) => {
-            for op in &definitions[id as usize] {
-                eval_op(*op, stack, definitions)?;
+
+        Ok(())
+    }
+
+    fn do_stack_op(&mut self, command: &str) -> Result {
+        let rhs = match self.stack.pop() {
+            None => return Err(Error::StackUnderflow),
+            Some(i) => i,
+        };
+
+        match command {
+            DROP => Ok(()),
+            DUP => {
+                self.stack.push(rhs);
+                self.stack.push(rhs);
+                Ok(())
+            }
+            SWAP => match self.stack.pop() {
+                None => Err(Error::StackUnderflow),
+                Some(lhs) => {
+                    self.stack.push(rhs);
+                    self.stack.push(lhs);
+                    Ok(())
+                }
+            },
+            OVER => match self.stack.pop() {
+                None => Err(Error::StackUnderflow),
+                Some(lhs) => {
+                    self.stack.push(lhs);
+                    self.stack.push(rhs);
+                    self.stack.push(lhs);
+                    Ok(())
+                }
+            },
+            _ => Err(Error::InvalidWord),
+        }
+    }
+
+    fn replace(&mut self, word: &str, old_definition: &str) {
+        // self.words.clone().iter().for_each(|(command, expansion)| {
+        //     if expansion.split_whitespace().any(|term| term == word) {
+        //         let definition = expansion
+        //             .split_whitespace()
+        //             .map(|term| match term.to_string() {
+        //                 t if t == word => old_definition.to_owned(),
+        //                 t => t,
+        //             })
+        //             .collect::<Vec<String>>()
+        //             .join(" ");
+        //         self.words.insert(command.clone(), definition);
+        //     }
+        // });
+        
+        for (command, expansion) in self.words.clone() {
+            if expansion.split_whitespace().any(|term| term == word) {
+                let definition = expansion
+                    .split_whitespace()
+                    .map(|term| match term.to_string() {
+                        t if t == word => old_definition.to_owned(),
+                        t => t,
+                    })
+                    .collect::<Vec<String>>()
+                    .join(" ");
+                self.words.insert(command.clone(), definition);
             }
         }
     }
-    Ok(())
 }
-
-
